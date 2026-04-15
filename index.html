@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FB Compilador Python - Islam Moçambique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/eclipse.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3776ab;
+            --primary-dark: #2d5a8a;
+            --secondary: #ffd43b;
+            --bg-dark: #1e1e1e;
+            --bg-light: #f5f5f5;
+            --text-dark: #333;
+            --text-light: #fff;
+            --border-dark: #333;
+            --border-light: #ddd;
+            --success: #28a745;
+            --error: #dc3545;
+            --warning: #ffc107;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        body.light-theme {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--primary-dark);
+            font-weight: bold;
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            color: white;
+        }
+
+        .brand span {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-run {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-run:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            height: calc(100vh - 80px);
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Editor Section */
+        .editor-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #2d2d2d;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        body.light-theme .editor-section {
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        body.light-theme .section-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .editor-toolbar {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toolbar-btn {
+            background: transparent;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        body.light-theme .toolbar-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .CodeMirror {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.6;
+            font-family: 'Fira Code', 'Consolas', monospace;
+        }
+
+        /* Output Section */
+        .output-section {
+            flex: 0 0 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .output-panel, .input-panel {
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.light-theme .output-panel,
+        body.light-theme .input-panel {
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .panel-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        #output {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .output-line {
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+
+        .output-line.error {
+            color: #ff6b6b;
+        }
+
+        .output-line.success {
+            color: #51cf66;
+        }
+
+        .output-line.info {
+            color: #74c0fc;
+        }
+
+        body.light-theme .output-line.error {
+            color: var(--error);
+        }
+
+        body.light-theme .output-line.success {
+            color: var(--success);
+        }
+
+        .input-area {
+            width: 100%;
+            min-height: 80px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            padding: 10px;
+            color: inherit;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            resize: vertical;
+        }
+
+        body.light-theme .input-area {
+            border-color: var(--border-light);
+            background: #f8f9fa;
+        }
+
+        /* Support Section */
+        .support-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .support-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .support-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .support-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .support-item i {
+            width: 20px;
+        }
+
+        .support-item a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .support-item a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: white;
+            font-size: 16px;
+        }
+
+        /* Examples Dropdown */
+        .examples-dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #2d2d2d;
+            min-width: 250px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            border-radius: 8px;
+            margin-top: 10px;
+            z-index: 100;
+        }
+
+        body.light-theme .dropdown-content {
+            background: white;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: background 0.2s;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        body.light-theme .dropdown-item:hover {
+            background: #f0f0f0;
+        }
+
+        .dropdown-item-title {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .dropdown-item-desc {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .output-section {
+                flex: none;
+            }
+
+            .header {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        body.light-theme ::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.2);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            padding: 8px 20px;
+            background: rgba(0,0,0,0.3);
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.light-theme .status-bar {
+            background: #e9ecef;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Clear button for output */
+        .clear-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: inherit;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .clear-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        body.light-theme .clear-btn {
+            border-color: var(--border-light);
+        }
+
+        body.light-theme .clear-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">A carregar Python...</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">FB</div>
+            <div class="brand">
+                <h1>FB Compilador Python</h1>
+                <span>Islam Moçambique - Programação para Todos</span>
+            </div>
+        </div>
+        
+        <div class="header-actions">
+            <div class="examples-dropdown">
+                <button class="btn btn-secondary" onclick="toggleExamples()">
+                    <i class="fas fa-code"></i> Exemplos
+                </button>
+                <div class="dropdown-content" id="examplesDropdown">
+                    <div class="dropdown-item" onclick="loadExample('hello')">
+                        <div class="dropdown-item-title">Olá Mundo</div>
+                        <div class="dropdown-item-desc">O clássico primeiro programa</div>
+                    </div>
+                    <div class="dropdown-item" onclick="loadExample('calculator')">
+                        <div class="dropdown-item-title">Calculadora Simples</div>
+                        <div class="dropdown-item-desc">Operações matemáticas básicas</div>
+                    </div>
+                    <div class="dropdown-item" onclick="loadExample('loop')">
+                        <div class="dropdown-item-title">Ciclos (Loops)</div>
+                        <div class="dropdown-item-desc">For e While loops</div>
+                    </div>
+                    <div class="dropdown-item" onclick="loadExample('list')">
+                        <div class="dropdown-item-title">Listas</div>
+                        <div class="dropdown-item-desc">Manipulação de listas</div>
+                    </div>
+                    <div class="dropdown-item" onclick="loadExample('function')">
+                        <div class="dropdown-item-title">Funções</div>
+                        <div class="dropdown-item-desc">Definição e chamada de funções</div>
+                    </div>
+                    <div class="dropdown-item" onclick="loadExample('input')">
+                        <div class="dropdown-item-title">Entrada de Dados</div>
+                        <div class="dropdown-item-desc">Input do utilizador</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="toggleTheme()">
+                <i class="fas fa-moon" id="themeIcon"></i> Tema
+            </button>
+
+            <button class="btn btn-secondary" onclick="clearEditor()">
+                <i class="fas fa-trash"></i> Limpar
+            </button>
+
+            <button class="btn btn-run" id="runBtn" onclick="runCode()" disabled>
+                <i class="fas fa-play"></i> Executar
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Editor Section -->
+        <div class="editor-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fab fa-python" style="color: var(--secondary);"></i>
+                    main.py
+                </div>
+                <div class="editor-toolbar">
+                    <button class="toolbar-btn" onclick="downloadCode()" title="Download">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="toolbar-btn" onclick="copyCode()" title="Copiar">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="toolbar-btn" onclick="pasteCode()" title="Colar">
+                        <i class="fas fa-paste"></i>
+                    </button>
+                </div>
+            </div>
+            <textarea id="codeEditor"></textarea>
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-indicator"></span>
+                    <span>Python 3.11 pronto</span>
+                </div>
+                <div class="status-item" id="cursorPos">
+                    Linha 1, Coluna 1
+                </div>
+            </div>
+        </div>
+
+        <!-- Output Section -->
+        <div class="output-section">
+            <!-- Output Panel -->
+            <div class="output-panel" style="flex: 2;">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-terminal"></i>
+                        Terminal / Output
+                    </div>
+                    <button class="clear-btn" onclick="clearOutput()">
+                        <i class="fas fa-eraser"></i> Limpar
+                    </button>
+                </div>
+                <div class="panel-content" id="output">
+                    <div class="output-line info">Python 3.11.0 (Pyodide) pronto para executar.</div>
+                    <div class="output-line info">Clique em "Executar" para correr o código.</div>
+                </div>
+            </div>
+
+            <!-- Input Panel -->
+            <div class="input-panel">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-keyboard"></i>
+                        Entrada (stdin)
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <textarea class="input-area" id="inputArea" placeholder="Digite aqui os dados de entrada para o seu programa... (cada linha será um input separado)"></textarea>
+                </div>
+            </div>
+
+            <!-- Support Section -->
+            <div class="support-section">
+                <div class="support-header">
+                    <i class="fas fa-headset"></i>
+                    Suporte Técnico
+                </div>
+                <div class="support-info">
+                    <div class="support-item">
+                        <i class="fab fa-whatsapp"></i>
+                        <a href="https://wa.me/258860407269" target="_blank">+258 86 040 7269</a>
+                    </div>
+                    <div class="support-item">
+                        <i class="fas fa-phone"></i>
+                        <span>860407269</span>
+                    </div>
+                    <div class="support-item">
+                        <i class="fas fa-user"></i>
+                        <span>Anacleto Bebane</span>
+                    </div>
+                    <div class="support-item">
+                        <i class="fas fa-building"></i>
+                        <span>Islam Moçambique</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let pyodide = null;
+        let editor = null;
+        let isDarkTheme = true;
+
+        // Example programs
+        const examples = {
+            hello: `# Olá Mundo em Python
+print("Olá, Mundo!")
+print("Bem-vindo ao FB Compilador Python!")
+print("Islam Moçambique - Programação para Todos")`,
+
+            calculator: `# Calculadora Simples
+def calculadora():
+    print("=== Calculadora ===")
+    num1 = float(input("Digite o primeiro número: "))
+    operacao = input("Digite a operação (+, -, *, /): ")
+    num2 = float(input("Digite o segundo número: "))
+    
+    if operacao == "+":
+        resultado = num1 + num2
+    elif operacao == "-":
+        resultado = num1 - num2
+    elif operacao == "*":
+        resultado = num1 * num2
+    elif operacao == "/":
+        resultado = num1 / num2
+    else:
+        print("Operação inválida!")
+        return
+    
+    print(f"Resultado: {resultado}")
+
+calculadora()`,
+
+            loop: `# Ciclos em Python
+print("=== Ciclo For ===")
+for i in range(5):
+    print(f"Iteração {i}")
+
+print("\\n=== Ciclo While ===")
+contador = 0
+while contador < 5:
+    print(f"Contador: {contador}")
+    contador += 1`,
+
+            list: `# Manipulação de Listas
+frutas = ["Maçã", "Banana", "Laranja", "Manga"]
+print("Lista de frutas:", frutas)
+
+# Adicionar elemento
+frutas.append("Abacate")
+print("Após adicionar:", frutas)
+
+# Remover elemento
+frutas.remove("Banana")
+print("Após remover:", frutas)
+
+# Percorrer lista
+print("\\nPercorrendo a lista:")
+for fruta in frutas:
+    print(f"- {fruta}")`,
+
+            function: `# Funções em Python
+def saudacao(nome):
+    """Função que retorna uma saudação"""
+    return f"Olá, {nome}! Bem-vindo ao FB Compilador."
+
+def soma(a, b):
+    """Função que soma dois números"""
+    return a + b
+
+# Usar as funções
+nome = input("Digite seu nome: ")
+print(saudacao(nome))
+
+num1 = int(input("Digite um número: "))
+num2 = int(input("Digite outro número: "))
+print(f"A soma é: {soma(num1, num2)}")`,
+
+            input: `# Entrada de Dados
+print("=== Formulário de Cadastro ===")
+
+nome = input("Digite seu nome: ")
+idade = input("Digite sua idade: ")
+cidade = input("Digite sua cidade: ")
+
+print("\\n=== Dados Cadastrados ===")
+print(f"Nome: {nome}")
+print(f"Idade: {idade} anos")
+print(f"Cidade: {cidade}")
+print("\\nCadastro realizado com sucesso!")`
+        };
+
+        // Initialize Pyodide
+        async function initPyodide() {
+            try {
+                pyodide = await loadPyodide();
+                await pyodide.loadPackage("micropip");
+                
+                // Setup output redirect
+                pyodide.setStdout({ batched: (text) => appendOutput(text) });
+                pyodide.setStderr({ batched: (text) => appendOutput(text, 'error') });
+                
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                document.getElementById('runBtn').disabled = false;
+                
+                appendOutput("Python 3.11 carregado com sucesso!", "success");
+                appendOutput("Pronto para executar código!", "success");
+            } catch (error) {
+                appendOutput("Erro ao carregar Python: " + error.message, "error");
+            }
+        }
+
+        // Initialize CodeMirror
+        function initEditor() {
+            editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
+                mode: 'python',
+                theme: 'dracula',
+                lineNumbers: true,
+                autoCloseBrackets: true,
+                matchBrackets: true,
+                indentUnit: 4,
+                tabSize: 4,
+                lineWrapping: true,
+                foldGutter: true,
+                gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+                extraKeys: {
+                    "Ctrl-Enter": runCode,
+                    "Cmd-Enter": runCode,
+                    "F5": runCode,
+                    "Ctrl-S": function(cm) { downloadCode(); return false; },
+                    "Ctrl-/": "toggleComment"
+                }
+            });
+
+            // Set default code
+            editor.setValue(`# Bem-vindo ao FB Compilador Python!
+# Islam Moçambique - Programação para Todos
+
+print("Olá, Mundo!")
+print("Escreva seu código Python aqui...")
+
+# Dica: Use a área de Entrada para fornecer dados ao seu programa
+nome = input("Digite seu nome: ")
+print(f"Bem-vindo, {nome}!")`);
+
+            // Update cursor position
+            editor.on("cursorActivity", function() {
+                const pos = editor.getCursor();
+                document.getElementById('cursorPos').textContent = `Linha ${pos.line + 1}, Coluna ${pos.ch + 1}`;
+            });
+        }
+
+        // Run code
+        async function runCode() {
+            const code = editor.getValue();
+            const inputData = document.getElementById('inputArea').value;
+            
+            if (!code.trim()) {
+                appendOutput("Erro: Nenhum código para executar!", "error");
+                return;
+            }
+
+            document.getElementById('runBtn').disabled = true;
+            document.getElementById('runBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> A executar...';
+            
+            clearOutput();
+            appendOutput("=== A executar código ===\\n", "info");
+
+            try {
+                // Setup input handling
+                const inputs = inputData.split('\\n').filter(line => line.trim() !== '');
+                let inputIndex = 0;
+                
+                // Override input function
+                pyodide.globals.set("input", function(prompt) {
+                    if (prompt) {
+                        appendOutput(prompt, "info");
+                    }
+                    if (inputIndex < inputs.length) {
+                        return inputs[inputIndex++];
+                    }
+                    return "";
+                });
+
+                await pyodide.runPythonAsync(code);
+                appendOutput("\\n=== Execução concluída ===", "success");
+            } catch (error) {
+                appendOutput("\\n" + error.message, "error");
+                appendOutput("\\n=== Execução terminada com erros ===", "error");
+            } finally {
+                document.getElementById('runBtn').disabled = false;
+                document.getElementById('runBtn').innerHTML = '<i class="fas fa-play"></i> Executar';
+            }
+        }
+
+        // Output functions
+        function appendOutput(text, type = '') {
+            const output = document.getElementById('output');
+            const line = document.createElement('div');
+            line.className = `output-line ${type}`;
+            line.textContent = text;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+        }
+
+        function clearEditor() {
+            if (confirm('Tem certeza que deseja limpar o editor?')) {
+                editor.setValue('');
+                editor.focus();
+            }
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            isDarkTheme = !isDarkTheme;
+            document.body.classList.toggle('light-theme');
+            
+            const icon = document.getElementById('themeIcon');
+            if (isDarkTheme) {
+                icon.className = 'fas fa-moon';
+                editor.setOption('theme', 'dracula');
+            } else {
+                icon.className = 'fas fa-sun';
+                editor.setOption('theme', 'eclipse');
+            }
+        }
+
+        // Examples
+        function toggleExamples() {
+            document.getElementById('examplesDropdown').classList.toggle('show');
+        }
+
+        function loadExample(exampleName) {
+            if (examples[exampleName]) {
+                editor.setValue(examples[exampleName]);
+                document.getElementById('examplesDropdown').classList.remove('show');
+                editor.focus();
+            }
+        }
+
+        // File operations
+        function downloadCode() {
+            const code = editor.getValue();
+            const blob = new Blob([code], { type: 'text/x-python' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'main.py';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function copyCode() {
+            const code = editor.getValue();
+            navigator.clipboard.writeText(code).then(() => {
+                appendOutput("Código copiado para a área de transferência!", "success");
+            });
+        }
+
+        async function pasteCode() {
+            try {
+                const text = await navigator.clipboard.readText();
+                editor.replaceSelection(text);
+            } catch (err) {
+                appendOutput("Erro ao colar: " + err.message, "error");
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.examples-dropdown')) {
+                document.getElementById('examplesDropdown').classList.remove('show');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F5') {
+                e.preventDefault();
+                runCode();
+            }
+        });
+
+        // Initialize
+        window.addEventListener('load', function() {
+            initEditor();
+            initPyodide();
+        });
+    </script>
+</body>
+</html>
