@@ -40,13 +40,11 @@ const BOT_BRAIN = {
     },
 
     "allah": {
-        keywords: ["allah", "quem é allah", "deus no islam"],
-        answer: "Allah é o Criador dos céus e da terra, perfeito e sem início nem fim.",
-        source: {
-            reference: "Alcorão 2:255",
-            url: "https://quran.com/2/255"
-        }
-    },
+    keywords: ["allah"],
+    answer: "Allah é o Criador dos céus e da terra.",
+    source: "Alcorão 2:255",
+    link: "https://quran.com/2/255"
+},
 
     "muhammad": {
         keywords: ["muhammad", "profeta muhammad", "mensageiro"],
