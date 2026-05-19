@@ -2,993 +2,748 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FB Compilador Python - Islam Moçambique</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/eclipse.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Islam M.bot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
-            --primary: #3776ab;
-            --primary-dark: #2d5a8a;
-            --secondary: #ffd43b;
-            --bg-dark: #1e1e1e;
-            --bg-light: #f5f5f5;
-            --text-dark: #333;
-            --text-light: #fff;
-            --border-dark: #333;
-            --border-light: #ddd;
-            --success: #28a745;
-            --error: #dc3545;
-            --warning: #ffc107;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-light);
-            overflow-x: hidden;
-            transition: all 0.3s ease;
-        }
-
-        body.light-theme {
-            background: var(--bg-light);
-            color: var(--text-dark);
-        }
-
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo {
-            width: 50px;
-            height: 50px;
-            background: var(--secondary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: var(--primary-dark);
-            font-weight: bold;
-        }
-
-        .brand {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .brand h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            color: white;
-        }
-
-        .brand span {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.8);
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-run {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-run:hover {
-            background: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255,255,255,0.2);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* Main Container */
-        .container {
-            display: flex;
-            height: calc(100vh - 80px);
-            padding: 20px;
-            gap: 20px;
-        }
-
-        /* Editor Section */
-        .editor-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #2d2d2d;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-
-        body.light-theme .editor-section {
-            background: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        .section-header {
-            padding: 15px 20px;
-            background: rgba(0,0,0,0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        body.light-theme .section-header {
-            background: #f8f9fa;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .section-title {
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .editor-toolbar {
-            display: flex;
-            gap: 10px;
-        }
-
-        .toolbar-btn {
-            background: transparent;
-            border: none;
-            color: inherit;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            transition: all 0.2s;
-        }
-
-        .toolbar-btn:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        body.light-theme .toolbar-btn:hover {
-            background: rgba(0,0,0,0.05);
-        }
-
-        .CodeMirror {
-            flex: 1;
-            font-size: 14px;
-            line-height: 1.6;
-            font-family: 'Fira Code', 'Consolas', monospace;
-        }
-
-        /* Output Section */
-        .output-section {
-            flex: 0 0 400px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .output-panel, .input-panel {
-            background: #1a1a1a;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-        }
-
-        body.light-theme .output-panel,
-        body.light-theme .input-panel {
-            background: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        .panel-content {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            font-family: 'Consolas', monospace;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        #output {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .output-line {
-            margin: 2px 0;
-            padding: 2px 0;
-        }
-
-        .output-line.error {
-            color: #ff6b6b;
-        }
-
-        .output-line.success {
-            color: #51cf66;
-        }
-
-        .output-line.info {
-            color: #74c0fc;
-        }
-
-        body.light-theme .output-line.error {
-            color: var(--error);
-        }
-
-        body.light-theme .output-line.success {
-            color: var(--success);
-        }
-
-        .input-area {
-            width: 100%;
-            min-height: 80px;
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 6px;
-            padding: 10px;
-            color: inherit;
-            font-family: 'Consolas', monospace;
-            font-size: 13px;
-            resize: vertical;
-        }
-
-        body.light-theme .input-area {
-            border-color: var(--border-light);
-            background: #f8f9fa;
-        }
-
-        /* Support Section */
-        .support-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 20px;
-            color: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-
-        .support-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .support-info {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .support-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-
-        .support-item i {
-            width: 20px;
-        }
-
-        .support-item a {
-            color: white;
-            text-decoration: none;
-            transition: opacity 0.2s;
-        }
-
-        .support-item a:hover {
-            opacity: 0.8;
-            text-decoration: underline;
-        }
-
-        /* Loading Overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.3s;
-        }
-
-        .loading-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255,255,255,0.1);
-            border-top-color: var(--secondary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            margin-top: 20px;
-            color: white;
-            font-size: 16px;
-        }
-
-        /* Examples Dropdown */
-        .examples-dropdown {
-            position: relative;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: #2d2d2d;
-            min-width: 250px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            border-radius: 8px;
-            margin-top: 10px;
-            z-index: 100;
-        }
-
-        body.light-theme .dropdown-content {
-            background: white;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-
-        .dropdown-content.show {
-            display: block;
-        }
-
-        .dropdown-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            transition: background 0.2s;
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        body.light-theme .dropdown-item:hover {
-            background: #f0f0f0;
-        }
-
-        .dropdown-item-title {
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .dropdown-item-desc {
-            font-size: 11px;
-            opacity: 0.7;
-            margin-top: 2px;
-        }
-
-        /* Responsive */
-        @media (max-width: 968px) {
-            .container {
-                flex-direction: column;
-                height: auto;
-            }
-
-            .output-section {
-                flex: none;
-            }
-
-            .header {
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        body.light-theme ::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.2);
-        }
-
-        /* Status Bar */
-        .status-bar {
-            padding: 8px 20px;
-            background: rgba(0,0,0,0.3);
-            font-size: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        body.light-theme .status-bar {
-            background: #e9ecef;
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--success);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Clear button for output */
-        .clear-btn {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: inherit;
-            padding: 4px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
-        }
-
-        .clear-btn:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        body.light-theme .clear-btn {
-            border-color: var(--border-light);
-        }
-
-        body.light-theme .clear-btn:hover {
-            background: rgba(0,0,0,0.05);
+            --primary: #1a5f3f; --primary-light: #2d8a5e; --primary-dark: #0d3d28;
+            --accent: #c9a227; --accent-light: #e8d47a;
+            --bg: #f0f4f0; --card-bg: #ffffff; --text: #1a1a1a;
+            --text-secondary: #666666; --border: #d0ddd5;
+            --bot-msg: #e8f5e9; --user-msg: #ffffff;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+            --radius: 16px; --transition: all 0.3s ease;
+        }
+        [data-theme="dark"] {
+            --bg: #0f1a14; --card-bg: #16251d; --text: #f0f4f2;
+            --text-secondary: #90a498; --border: #233b2e;
+            --bot-msg: #1c3527; --user-msg: #233b2e;
+            --shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); height: 100vh; display: grid; grid-template-columns: 280px 1fr; transition: var(--transition); overflow: hidden; }
+        .sidebar { background-color: var(--card-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; transition: var(--transition); z-index: 100; }
+        .brand { display: flex; align-items: center; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .brand i { font-size: 24px; color: var(--accent); }
+        .brand h2 { font-size: 20px; font-weight: 600; color: var(--primary); }
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .nav-item a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text-secondary); text-decoration: none; border-radius: var(--radius); font-size: 14px; font-weight: 500; transition: var(--transition); }
+        .nav-item.active a, .nav-item a:hover { background-color: var(--primary); color: white; }
+        .nav-item.active a i, .nav-item a:hover i { color: var(--accent); }
+        .sidebar-footer { padding-top: 20px; border-top: 1px solid var(--border); }
+        .support-info { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; padding: 15px; border-radius: var(--radius); margin-bottom: 15px; font-size: 12px; line-height: 1.8; }
+        .support-info h4 { color: var(--accent-light); margin-bottom: 8px; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .support-info .tag { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 8px; margin-top: 4px; font-size: 11px; }
+        .theme-toggle { background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; padding: 8px; border-radius: 50%; transition: var(--transition); }
+        .theme-toggle:hover { background-color: var(--bg); color: var(--primary); }
+        .chat-container { display: flex; flex-direction: column; height: 100vh; position: relative; }
+        .chat-header { background-color: var(--card-bg); padding: 15px 25px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; transition: var(--transition); box-shadow: var(--shadow); }
+        .bot-info { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-light)); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 20px; box-shadow: 0 4px 10px rgba(26,95,63,0.2); }
+        .status-info h3 { font-size: 16px; font-weight: 600; }
+        .status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+        .status::before { content: ''; width: 8px; height: 8px; background-color: #2ec4b6; border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46,196,182,0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46,196,182,0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46,196,182,0); } }
+        .header-actions { display: flex; gap: 10px; }
+        .action-btn { background: none; border: none; color: var(--text-secondary); font-size: 16px; padding: 10px; border-radius: var(--radius); cursor: pointer; transition: var(--transition); }
+        .action-btn:hover { background-color: var(--bg); color: var(--primary); }
+        .messages-area { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; background-image: radial-gradient(var(--border) 1px, transparent 0); background-size: 24px 24px; }
+        .message-wrapper { display: flex; gap: 12px; max-width: 80%; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .message-wrapper.user { align-self: flex-end; flex-direction: row-reverse; }
+        .msg-avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .bot .msg-avatar { background: var(--primary); color: var(--accent); }
+        .user .msg-avatar { background: var(--accent); color: white; }
+        .message-content { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+        .text-box { padding: 14px 18px; border-radius: var(--radius); font-size: 14.5px; line-height: 1.6; box-shadow: var(--shadow); position: relative; word-break: break-word; }
+        .bot .text-box { background-color: var(--bot-msg); color: var(--text); border-top-left-radius: 4px; }
+        .user .text-box { background-color: var(--primary); color: white; border-top-right-radius: 4px; }
+        .timestamp { font-size: 11px; color: var(--text-secondary); align-self: flex-end; margin-top: 2px; }
+        .user .timestamp { color: rgba(255,255,255,0.7); align-self: flex-start; }
+        .typing-indicator { display: flex; gap: 5px; padding: 8px 12px; background: var(--bot-msg); border-radius: var(--radius); align-items: center; width: fit-content; }
+        .typing-indicator span { width: 8px; height: 8px; background-color: var(--primary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+        .input-area { padding: 20px 25px; background-color: var(--card-bg); border-top: 1px solid var(--border); display: flex; gap: 15px; align-items: center; transition: var(--transition); }
+        .input-wrapper { flex: 1; position: relative; display: flex; align-items: center; background-color: var(--bg); border: 1px solid var(--border); border-radius: 24px; padding: 5px 15px; transition: var(--transition); }
+        .input-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,95,63,0.1); }
+        .chat-input { width: 100%; border: none; background: none; padding: 10px 5px; font-size: 14.5px; color: var(--text); outline: none; }
+        .input-actions { display: flex; gap: 8px; }
+        .input-action-btn { background: none; border: none; color: var(--text-secondary); font-size: 16px; cursor: pointer; padding: 8px; border-radius: 50%; transition: var(--transition); }
+        .input-action-btn:hover { color: var(--primary); background-color: rgba(26,95,63,0.05); }
+        .send-btn { background-color: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: var(--transition); box-shadow: 0 4px 10px rgba(26,95,63,0.2); }
+        .send-btn:hover { background-color: var(--primary-light); transform: scale(1.05); }
+        .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .arabic-text { font-family: 'Amiri', serif; font-size: 20px; text-align: right; direction: rtl; margin: 10px 0; padding: 12px; background: rgba(26,95,63,0.05); border-radius: 8px; line-height: 1.8; }
+        .source-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: white; font-size: 11px; padding: 4px 10px; border-radius: 12px; margin-top: 8px; }
+        .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .quick-reply { background: var(--primary-light); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: var(--transition); }
+        .quick-reply:hover { background: var(--primary); transform: translateY(-1px); }
+        .hadith-box { background: rgba(26,95,63,0.06); border-left: 3px solid var(--primary); padding: 12px; border-radius: 0 8px 8px 0; margin: 10px 0; }
+        .hadith-narrator { font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px; }
+        .hadith-grade { display: inline-block; background: var(--primary); color: white; font-size: 10px; padding: 2px 10px; border-radius: 10px; margin-top: 8px; }
+        .ayah-box { background: rgba(201,162,39,0.08); border: 1px solid var(--accent-light); padding: 14px; border-radius: 12px; margin: 10px 0; }
+        .ayah-ref { font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 8px; }
+        .prayer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+        .prayer-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px; text-align: center; }
+        .prayer-card.next { border-color: var(--accent); background: rgba(201,162,39,0.08); }
+        .prayer-name { font-size: 11px; color: var(--text-secondary); }
+        .prayer-time { font-size: 16px; font-weight: 600; color: var(--primary); margin-top: 4px; }
+        .menu-toggle { display: none; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 99; animation: fadeIn 0.3s ease; }
+        @media (max-width: 900px) {
+            body { grid-template-columns: 1fr; }
+            .sidebar { position: fixed; left: -280px; top: 0; bottom: 0; width: 280px; box-shadow: 5px 0 15px rgba(0,0,0,0.1); }
+            .sidebar.open { left: 0; }
+            .menu-toggle { display: block; }
+            .message-wrapper { max-width: 90%; }
+            .prayer-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-        <div class="loading-text">A carregar Python...</div>
-    </div>
-
-    <!-- Header -->
-    <header class="header">
-        <div class="logo-section">
-            <div class="logo">FB</div>
-            <div class="brand">
-                <h1>FB Compilador Python</h1>
-                <span>Islam Moçambique - Programação para Todos</span>
-            </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-kaaba"></i>
+            <h2>Islam M.bot</h2>
         </div>
-        
-        <div class="header-actions">
-            <div class="examples-dropdown">
-                <button class="btn btn-secondary" onclick="toggleExamples()">
-                    <i class="fas fa-code"></i> Exemplos
-                </button>
-                <div class="dropdown-content" id="examplesDropdown">
-                    <div class="dropdown-item" onclick="loadExample('hello')">
-                        <div class="dropdown-item-title">Olá Mundo</div>
-                        <div class="dropdown-item-desc">O clássico primeiro programa</div>
-                    </div>
-                    <div class="dropdown-item" onclick="loadExample('calculator')">
-                        <div class="dropdown-item-title">Calculadora Simples</div>
-                        <div class="dropdown-item-desc">Operações matemáticas básicas</div>
-                    </div>
-                    <div class="dropdown-item" onclick="loadExample('loop')">
-                        <div class="dropdown-item-title">Ciclos (Loops)</div>
-                        <div class="dropdown-item-desc">For e While loops</div>
-                    </div>
-                    <div class="dropdown-item" onclick="loadExample('list')">
-                        <div class="dropdown-item-title">Listas</div>
-                        <div class="dropdown-item-desc">Manipulação de listas</div>
-                    </div>
-                    <div class="dropdown-item" onclick="loadExample('function')">
-                        <div class="dropdown-item-title">Funções</div>
-                        <div class="dropdown-item-desc">Definição e chamada de funções</div>
-                    </div>
-                    <div class="dropdown-item" onclick="loadExample('input')">
-                        <div class="dropdown-item-title">Entrada de Dados</div>
-                        <div class="dropdown-item-desc">Input do utilizador</div>
-                    </div>
-                </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" data-section="chat"><a href="#"><i class="fa-solid fa-comments"></i> Chat</a></li>
+            <li class="nav-item" data-section="quran"><a href="#"><i class="fa-solid fa-book-quran"></i> Alcorão</a></li>
+            <li class="nav-item" data-section="prayer"><a href="#"><i class="fa-solid fa-clock"></i> Orações</a></li>
+            <li class="nav-item" data-section="qibla"><a href="#"><i class="fa-solid fa-compass"></i> Qibla</a></li>
+            <li class="nav-item" data-section="duas"><a href="#"><i class="fa-solid fa-bookmark"></i> Duas</a></li>
+            <li class="nav-item" data-section="support"><a href="#"><i class="fa-solid fa-hand-holding-heart"></i> Apoio</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="support-info">
+                <h4><i class="fa-solid fa-heart"></i> Islam Moçambique</h4>
+                <p><i class="fa-solid fa-phone"></i> Suporte: <strong>860407269</strong></p>
+                <p><i class="fa-brands fa-whatsapp"></i> WhatsApp: <strong>860407269</strong></p>
+                <div class="tag"><i class="fa-solid fa-money-bill"></i> M-Pesa Agente: <strong>1228803</strong></div>
+                <div class="tag"><i class="fa-solid fa-wallet"></i> Emola: <strong>860407269</strong></div>
+                <div class="tag"><i class="fa-solid fa-building-columns"></i> Banco BIM NIB: <strong>0001000000124733562</strong></div>
             </div>
-
-            <button class="btn btn-secondary" onclick="toggleTheme()">
-                <i class="fas fa-moon" id="themeIcon"></i> Tema
-            </button>
-
-            <button class="btn btn-secondary" onclick="clearEditor()">
-                <i class="fas fa-trash"></i> Limpar
-            </button>
-
-            <button class="btn btn-run" id="runBtn" onclick="runCode()" disabled>
-                <i class="fas fa-play"></i> Executar
-            </button>
+            <button class="theme-toggle" id="themeToggle"><i class="fa-solid fa-moon"></i></button>
         </div>
-    </header>
+    </aside>
 
-    <!-- Main Container -->
-    <div class="container">
-        <!-- Editor Section -->
-        <div class="editor-section">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fab fa-python" style="color: var(--secondary);"></i>
-                    main.py
-                </div>
-                <div class="editor-toolbar">
-                    <button class="toolbar-btn" onclick="downloadCode()" title="Download">
-                        <i class="fas fa-download"></i>
-                    </button>
-                    <button class="toolbar-btn" onclick="copyCode()" title="Copiar">
-                        <i class="fas fa-copy"></i>
-                    </button>
-                    <button class="toolbar-btn" onclick="pasteCode()" title="Colar">
-                        <i class="fas fa-paste"></i>
-                    </button>
+    <main class="chat-container">
+        <header class="chat-header">
+            <div class="bot-info">
+                <button class="action-btn menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+                <div class="avatar"><i class="fa-solid fa-mosque"></i></div>
+                <div class="status-info">
+                    <h3>Islam M.bot</h3>
+                    <div class="status">Online</div>
                 </div>
             </div>
-            <textarea id="codeEditor"></textarea>
-            <div class="status-bar">
-                <div class="status-item">
-                    <span class="status-indicator"></span>
-                    <span>Python 3.11 pronto</span>
-                </div>
-                <div class="status-item" id="cursorPos">
-                    Linha 1, Coluna 1
+            <div class="header-actions">
+                <button class="action-btn" id="clearChatBtn" title="Limpar"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+        </header>
+
+        <section class="messages-area" id="messagesArea">
+            <div class="message-wrapper bot">
+                <div class="msg-avatar"><i class="fa-solid fa-mosque"></i></div>
+                <div class="message-content">
+                    <div class="text-box">
+                        <strong>Assalamu Alaikum! 🌙</strong><br><br>
+                        Sou o Islam M.bot, criado por <strong>Islam Moçambique</strong>.<br><br>
+                        Pergunte-me sobre Islam, Alcorão, Sunnah, Fiqh, orações...<br><br>
+                        <div class="quick-replies">
+                            <button class="quick-reply" onclick="sendQuickReply('O que é Islam?')">Islam</button>
+                            <button class="quick-reply" onclick="sendQuickReply('O que é Alcorão?')">Alcorão</button>
+                            <button class="quick-reply" onclick="sendQuickReply('Como fazer wudu?')">Wudu</button>
+                            <button class="quick-reply" onclick="sendQuickReply('Horários de oração Maputo')">Orações</button>
+                            <button class="quick-reply" onclick="sendQuickReply('Hadith sobre caridade')">Caridade</button>
+                        </div>
+                    </div>
+                    <span class="timestamp" data-time="auto"></span>
                 </div>
             </div>
-        </div>
-
-        <!-- Output Section -->
-        <div class="output-section">
-            <!-- Output Panel -->
-            <div class="output-panel" style="flex: 2;">
-                <div class="section-header">
-                    <div class="section-title">
-                        <i class="fas fa-terminal"></i>
-                        Terminal / Output
-                    </div>
-                    <button class="clear-btn" onclick="clearOutput()">
-                        <i class="fas fa-eraser"></i> Limpar
-                    </button>
-                </div>
-                <div class="panel-content" id="output">
-                    <div class="output-line info">Python 3.11.0 (Pyodide) pronto para executar.</div>
-                    <div class="output-line info">Clique em "Executar" para correr o código.</div>
+            <div class="message-wrapper bot" id="typingIndicator" style="display: none;">
+                <div class="msg-avatar"><i class="fa-solid fa-mosque"></i></div>
+                <div class="message-content">
+                    <div class="typing-indicator"><span></span><span></span><span></span></div>
                 </div>
             </div>
+        </section>
 
-            <!-- Input Panel -->
-            <div class="input-panel">
-                <div class="section-header">
-                    <div class="section-title">
-                        <i class="fas fa-keyboard"></i>
-                        Entrada (stdin)
-                    </div>
-                </div>
-                <div class="panel-content">
-                    <textarea class="input-area" id="inputArea" placeholder="Digite aqui os dados de entrada para o seu programa... (cada linha será um input separado)"></textarea>
+        <footer class="input-area">
+            <div class="input-wrapper">
+                <button class="input-action-btn" onclick="insertArabic()"><i class="fa-solid fa-star-and-crescent"></i></button>
+                <input type="text" class="chat-input" placeholder="Pergunte sobre Islam..." id="chatInput">
+                <div class="input-actions">
+                    <button class="input-action-btn" id="voiceBtn"><i class="fa-solid fa-microphone"></i></button>
                 </div>
             </div>
+            <button class="send-btn" id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+        </footer>
+    </main>
 
-            <!-- Support Section -->
-            <div class="support-section">
-                <div class="support-header">
-                    <i class="fas fa-headset"></i>
-                    Suporte Técnico
-                </div>
-                <div class="support-info">
-                    <div class="support-item">
-                        <i class="fab fa-whatsapp"></i>
-                        <a href="https://wa.me/258860407269" target="_blank">+258 86 040 7269</a>
-                    </div>
-                    <div class="support-item">
-                        <i class="fas fa-phone"></i>
-                        <span>860407269</span>
-                    </div>
-                    <div class="support-item">
-                        <i class="fas fa-user"></i>
-                        <span>Anacleto Bebane</span>
-                    </div>
-                    <div class="support-item">
-                        <i class="fas fa-building"></i>
-                        <span>Islam Moçambique</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PASTA DE MEMÓRIA - ADICIONE SEU CONHECIMENTO AQUI     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <script>
-        // Global variables
-        let pyodide = null;
-        let editor = null;
-        let isDarkTheme = true;
+    // ============================================
+    // MEMÓRIA DO BOT - EDITE AQUI
+    // ============================================
+    // Adicione novos tópicos seguindo o formato:
+    // "pergunta ou palavra-chave": {
+    //     answer: "sua resposta em HTML",
+    //     source: "fonte islâmica"
+    // }
 
-        // Example programs
-        const examples = {
-            hello: `# Olá Mundo em Python
-print("Olá, Mundo!")
-print("Bem-vindo ao FB Compilador Python!")
-print("Islam Moçambique - Programação para Todos")`,
+    const botMemory = {
+        // --- AQEEDAH (CREDO) ---
+        "o que é islam": {
+            answer: `O <strong>Islam</strong> é a religião monoteísta revelada por Allah ao Profeta Muhammad (ﷺ). Significa "submissão" a Allah.<br><br>
+<strong>5 Pilares:</strong><br>
+1. Shahada (testemunho de fé)<br>
+2. Salat (oração 5x ao dia)<br>
+3. Zakat (caridade obrigatória)<br>
+4. Sawm (jejum de Ramadã)<br>
+5. Hajj (peregrinação)<br><br>
+<div class="arabic-text">إِنَّ الدِّينَ عِندَ اللَّهِ الْإِسْلَامُ</div>
+"Em verdade, a religião aceita por Allah é o Islam." <em>(Al-Imran 3:19)</em>`,
+            source: "Alcorão 3:19"
+        },
 
-            calculator: `# Calculadora Simples
-def calculadora():
-    print("=== Calculadora ===")
-    num1 = float(input("Digite o primeiro número: "))
-    operacao = input("Digite a operação (+, -, *, /): ")
-    num2 = float(input("Digite o segundo número: "))
-    
-    if operacao == "+":
-        resultado = num1 + num2
-    elif operacao == "-":
-        resultado = num1 - num2
-    elif operacao == "*":
-        resultado = num1 * num2
-    elif operacao == "/":
-        resultado = num1 / num2
-    else:
-        print("Operação inválida!")
-        return
-    
-    print(f"Resultado: {resultado}")
+        "o que é alcorão": {
+            answer: `O <strong>Alcorão</strong> é a palavra literal de Allah, revelada ao Profeta Muhammad (ﷺ) através do Anjo Gabriel.<br><br>
+• 114 Suras (capítulos)<br>
+• 6.236 versículos (Ayahs)<br>
+• Revelado em 23 anos<br>
+• Preservado intacto desde a revelação<br><br>
+<div class="arabic-text">إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ</div>
+"Em verdade, fomos Nós que revelamos o Alcorão, e somos seu Guardião." <em>(Al-Hijr 15:9)</em>`,
+            source: "Alcorão 15:9"
+        },
 
-calculadora()`,
+        "o que é sunnah": {
+            answer: `A <strong>Sunnah</strong> é o conjunto das práticas, palavras e aprovações do Profeta Muhammad (ﷺ). É a segunda fonte da legislação islâmica.<br><br>
+<strong>Tipos:</strong><br>
+• Sunnah Qawliyyah (palavras)<br>
+• Sunnah Fi'liyyah (ações)<br>
+• Sunnah Taqririyyah (aprovações)<br><br>
+<div class="hadith-box">
+<div class="hadith-narrator">Narrado por Al-Miqdam (رضي الله عنه)</div>
+"Deixei entre vós duas coisas: se as segurardes, nunca vos desviareis: o Livro de Allah e a minha Sunnah."
+<div class="hadith-grade">Sahih - Al-Muwatta 1661</div>
+</div>`,
+            source: "Al-Muwatta 1661 | Mishkat al-Masabih 186"
+        },
 
-            loop: `# Ciclos em Python
-print("=== Ciclo For ===")
-for i in range(5):
-    print(f"Iteração {i}")
+        "allah": {
+            answer: `<strong>Allah</strong> é o nome próprio do Criador em árabe. Significa "O único Deus verdadeiro digno de adoração".<br><br>
+<strong>Atributos:</strong><br>
+• Ar-Rahman (O Clemente)<br>
+• Ar-Rahim (O Misericordioso)<br>
+• Al-Malik (O Rei)<br>
+• Al-Quddus (O Santo)<br>
+• Al-Aziz (O Todo-Poderoso)<br><br>
+<div class="arabic-text">قُلْ هُوَ اللَّهُ أَحَدٌ ۝ اللَّهُ الصَّمَدُ ۝ لَمْ يَلِدْ وَلَمْ يُولَدْ ۝ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ</div>
+"Dize: Ele é Allah, o Único! Allah, o Absoluto! Não gerou, nem foi gerado! E não há ninguém igual a Ele!" <em>(Al-Ikhlas 112)</em>`,
+            source: "Alcorão 112"
+        },
 
-print("\\n=== Ciclo While ===")
-contador = 0
-while contador < 5:
-    print(f"Contador: {contador}")
-    contador += 1`,
+        "tawhid": {
+            answer: `O <strong>Tawhid</strong> é a crença na unicidade absoluta de Allah. É a fundação do Islam.<br><br>
+<strong>3 Tipos:</strong><br>
+1. <strong>Rububiyyah</strong> - Allah é o único Criador<br>
+2. <strong>Uluhiyyah</strong> - Toda adoração é só para Allah<br>
+3. <strong>Asma wa Sifat</strong> - Nomes e atributos de Allah<br><br>
+<div class="arabic-text">وَإِلَٰهُكُمْ إِلَٰهٌ وَاحِدٌ ۖ لَّا إِلَٰهَ إِلَّا هُوَ الرَّحْمَٰنُ الرَّحِيمُ</div>
+"E vosso Deus é um único Deus; não há divindade exceto Ele." <em>(Al-Baqarah 2:163)</em>`,
+            source: "Alcorão 2:163"
+        },
 
-            list: `# Manipulação de Listas
-frutas = ["Maçã", "Banana", "Laranja", "Manga"]
-print("Lista de frutas:", frutas)
+        "shirk": {
+            answer: `O <strong>Shirk</strong> é associar parceiros a Allah. É o maior pecado no Islam.<br><br>
+<strong>Tipos:</strong><br>
+• <strong>Shirk Akbar</strong> - Adorar ídolos, invocar mortos<br>
+• <strong>Shirk Asghar</strong> - Ostentação (Riya), jurar por outros<br><br>
+<div class="arabic-text">إِنَّ اللَّهَ لَا يَغْفِرُ أَن يُشْرَكَ بِهِ وَيَغْفِرُ مَا دُونَ ذَٰلِكَ لِمَن يَشَاءُ</div>
+"Allah não perdoa que se Lhe associe parceiros." <em>(An-Nisa 4:48)</em>`,
+            source: "Alcorão 4:48"
+        },
 
-# Adicionar elemento
-frutas.append("Abacate")
-print("Após adicionar:", frutas)
+        "profeta": {
+            answer: `O <strong>Profeta Muhammad</strong> (ﷺ) é o último e selo dos profetas.<br><br>
+• Nascido em Meca, 570 d.C.<br>
+• Primeira revelação aos 40 anos<br>
+• Migrou para Madinah em 622 d.C.<br>
+• Faleceu em 632 d.C.<br><br>
+<div class="arabic-text">مَّا كَانَ مُحَمَّدٌ أَبَا أَحَدٍ مِّن رِّجَالِكُمْ وَلَٰكِن رَّسُولَ اللَّهِ وَخَاتَمَ النَّبِيِّينَ</div>
+"Muhammad é o Mensageiro de Allah e o Selo dos Profetas." <em>(Al-Ahzab 33:40)</em>`,
+            source: "Alcorão 33:40"
+        },
 
-# Remover elemento
-frutas.remove("Banana")
-print("Após remover:", frutas)
+        // --- FIQH ---
+        "wudu": {
+            answer: `O <strong>Wudu</strong> é obrigatório antes da oração.<br><br>
+<strong>Passos:</strong><br>
+1. Intenção (Niyyah)<br>
+2. Dizer "Bismillah"<br>
+3. Lavar mãos 3x<br>
+4. Enxaguar boca 3x<br>
+5. Lavar nariz 3x<br>
+6. Lavar rosto 3x<br>
+7. Lavar braços até cotovelos 3x<br>
+8. Passar mãos na cabeça<br>
+9. Limpar ouvidos<br>
+10. Lavar pés 3x<br><br>
+<strong>Quebra wudu:</strong><br>
+• Impurezas (urina, fezes, gases)<br>
+• Sono profundo<br>
+• Tocar órgãos genitais<br><br>
+<div class="hadith-box">
+<div class="hadith-narrator">Narrado por Humran, servo de Uthman</div>
+"Uthman lavou as mãos três vezes... o rosto três vezes... os braços três vezes..."
+<div class="hadith-grade">Sahih - Bukhari 191 & Muslim 225</div>
+</div>`,
+            source: "Sahih al-Bukhari 191 | Sahih Muslim 225"
+        },
 
-# Percorrer lista
-print("\\nPercorrendo a lista:")
-for fruta in frutas:
-    print(f"- {fruta}")`,
+        "ghusl": {
+            answer: `O <strong>Ghusl</strong> (banho ritual) é obrigatório após:<br>
+• Relações conjugais<br>
+• Ejaculação<br>
+• Menstruação<br>
+• Pós-parto<br><br>
+<strong>Passos:</strong><br>
+1. Intenção<br>
+2. Lavar mãos 3x<br>
+3. Limpar área privada<br>
+4. Fazer wudu (exceto pés)<br>
+5. Deitar água na cabeça 3x<br>
+6. Lavar corpo direito, depois esquerdo<br>
+7. Lavar pés<br><br>
+<div class="hadith-box">
+<div class="hadith-narrator">Narrado por Aisha (رضي الله عنها)</div>
+"O Profeta (ﷺ) fazia ghusl começando pelas mãos, depois wudu, depois lavava a cabeça..."
+<div class="hadith-grade">Sahih - Muslim 316</div>
+</div>`,
+            source: "Sahih Muslim 316"
+        },
 
-            function: `# Funções em Python
-def saudacao(nome):
-    """Função que retorna uma saudação"""
-    return f"Olá, {nome}! Bem-vindo ao FB Compilador."
+        "salat": {
+            answer: `A <strong>Salat</strong> (oração) é obrigatória 5 vezes ao dia.<br><br>
+<strong>5 Orações:</strong><br>
+1. <strong>Fajr</strong> - 2 rak'ahs (amanhecer)<br>
+2. <strong>Dhuhr</strong> - 4 rak'ahs (meio-dia)<br>
+3. <strong>Asr</strong> - 4 rak'ahs (tarde)<br>
+4. <strong>Maghrib</strong> - 3 rak'ahs (pôr do sol)<br>
+5. <strong>Isha</strong> - 4 rak'ahs (noite)<br><br>
+<strong>Condições:</strong><br>
+• Wudu/Ghusl<br>
+• Cobertura Awrah<br>
+• Direção Qibla<br>
+• Intenção<br>
+• Horário correto<br><br>
+<div class="arabic-text">إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا</div>
+"A oração é obrigação em horários determinados." <em>(An-Nisa 4:103)</em>`,
+            source: "Alcorão 4:103 | Sahih Muslim 85"
+        },
 
-def soma(a, b):
-    """Função que soma dois números"""
-    return a + b
+        "zakat": {
+            answer: `A <strong>Zakat</strong> é obrigatória: <strong>2.5%</strong> da riqueza acima do Nisab após 1 ano.<br><br>
+<strong>Quem recebe (8 grupos):</strong><br>
+1. Os pobres (Fuqara)<br>
+2. Os necessitados (Masakin)<br>
+3. Administradores (Amilina)<br>
+4. Corações inclinados (Muallafah)<br>
+5. Libertar escravos<br>
+6. Endividados (Gharimin)<br>
+7. Na causa de Allah<br>
+8. Viajantes necessitados<br><br>
+<div class="arabic-text">خُذْ مِنْ أَمْوَالِهِمْ صَدَقَةً تُطَهِّرُهُمْ وَتُزَكِّيهِم بِهَا</div>
+"Toma de suas riquezas uma caridade para purificá-los." <em>(At-Tawbah 9:103)</em>`,
+            source: "Alcorão 9:60, 9:103"
+        },
 
-# Usar as funções
-nome = input("Digite seu nome: ")
-print(saudacao(nome))
+        "ramadan": {
+            answer: `O <strong>Jejum de Ramadã</strong> é obrigatório para muçulmanos adultos saudáveis.<br><br>
+<strong>Regras:</strong><br>
+• Abster-se de comida, bebida e relações desde Fajr até Maghrib<br>
+• Intenção antes do Fajr<br><br>
+<strong>Isentos:</strong><br>
+• Doentes, viajantes<br>
+• Grávidas/amamentando (com medo)<br>
+• Idosos fracos<br>
+• Menstruantes<br><br>
+<div class="arabic-text">يَا أَيُّهَا الَّذِينَ آمَنُوا كُتِبَ عَلَيْكُمُ الصِّيَامُ كَمَا كُتِبَ عَلَى الَّذِينَ مِن قَبْلِكُمْ لَعَلَّكُمْ تَتَّقُونَ</div>
+"O jejum vos foi prescrito para que sejais piedosos." <em>(Al-Baqarah 2:183)</em>`,
+            source: "Alcorão 2:183-185"
+        },
 
-num1 = int(input("Digite um número: "))
-num2 = int(input("Digite outro número: "))
-print(f"A soma é: {soma(num1, num2)}")`,
+        // --- HADITHS ---
+        "hadith caridade": {
+            answer: `<div class="hadith-box">
+<div class="hadith-narrator">Narrado por Abu Hurairah (رضي الله عنه)</div>
+"O Mensageiro de Allah (ﷺ) disse: 'A caridade não diminui a riqueza...'"
+<div class="hadith-grade">Sahih - Muslim 2588</div>
+</div><br>
+<div class="hadith-box">
+<div class="hadith-narrator">Narrado por Abu Dharr (رضي الله عنه)</div>
+"Sorrir para o seu irmão é caridade. Ordenar o bem e proibir o mal é caridade. Guiar alguém é caridade."
+<div class="hadith-grade">Sahih - Tirmidhi 1956</div>
+</div>`,
+            source: "Sahih Muslim 2588 | Tirmidhi 1956"
+        },
 
-            input: `# Entrada de Dados
-print("=== Formulário de Cadastro ===")
+        "hadith paciência": {
+            answer: `<div class="hadith-box">
+<div class="hadith-narrator">Narrado por Anas ibn Malik (رضي الله عنه)</div>
+"O Profeta (ﷺ) disse: 'Quão maravilhosa é a situação do crente! Tudo é bom para ele: se algo bom lhe acontece, agradece; se algo mal, é paciente.'"
+<div class="hadith-grade">Sahih - Muslim 2999</div>
+</div><br>
+<div class="hadith-box">
+<div class="hadith-narrator">Narrado por Abu Sa'id al-Khudri (رضي الله عنه)</div>
+"O Profeta (ﷺ) disse: 'Quem for paciente, Allah não lhe dará recompensa menor do que o Paraíso.'"
+<div class="hadith-grade">Sahih - Bukhari 6024 & Muslim 2806</div>
+</div>`,
+            source: "Sahih Muslim 2999 | Sahih al-Bukhari 6024"
+        },
 
-nome = input("Digite seu nome: ")
-idade = input("Digite sua idade: ")
-cidade = input("Digite sua cidade: ")
+        "hadith intenção": {
+            answer: `<div class="hadith-box">
+<div class="hadith-narrator">Narrado por Umar ibn al-Khattab (رضي الله عنه)</div>
+"O Profeta (ﷺ) disse: 'As ações são julgadas pelas intenções, e cada pessoa terá o que pretendeu.'"
+<div class="hadith-grade">Sahih - Bukhari 1 & Muslim 1907</div>
+</div>`,
+            source: "Sahih al-Bukhari 1 | Sahih Muslim 1907"
+        },
 
-print("\\n=== Dados Cadastrados ===")
-print(f"Nome: {nome}")
-print(f"Idade: {idade} anos")
-print(f"Cidade: {cidade}")
-print("\\nCadastro realizado com sucesso!")`
-        };
+        // --- DUAS ---
+        "dua ansiedade": {
+            answer: `<div class="ayah-box">
+<div class="arabic-text">لَا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ</div>
+"Não há divindade exceto Tu; glorificado sejas! Eu fui dos injustos."
+<div class="ayah-ref">Alcorão 21:87 (Dua de Yunus)</div>
+</div><br>
+<strong>Outras Duas:</strong><br>
+• <em>"Hasbunallahu wa ni'mal wakeel"</em> - Allah é suficiente (3:173)<br>
+• <em>"Allahumma inni a'udhu bika minal-hammi wal-hazani"</em> - Refúgio da ansiedade (Bukhari 6363)`,
+            source: "Alcorão 21:87 | Bukhari 6363"
+        },
 
-        // Initialize Pyodide
-        async function initPyodide() {
-            try {
-                pyodide = await loadPyodide();
-                await pyodide.loadPackage("micropip");
-                
-                // Setup output redirect
-                pyodide.setStdout({ batched: (text) => appendOutput(text) });
-                pyodide.setStderr({ batched: (text) => appendOutput(text, 'error') });
-                
-                document.getElementById('loadingOverlay').classList.add('hidden');
-                document.getElementById('runBtn').disabled = false;
-                
-                appendOutput("Python 3.11 carregado com sucesso!", "success");
-                appendOutput("Pronto para executar código!", "success");
-            } catch (error) {
-                appendOutput("Erro ao carregar Python: " + error.message, "error");
+        "dua sono": {
+            answer: `<div class="ayah-box">
+<div class="arabic-text">بِسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا</div>
+"Em Teu nome, ó Allah, eu morro e vivo."
+<div class="ayah-ref">Sahih al-Bukhari 247 & Muslim 2710</div>
+</div><br>
+<strong>Ao acordar:</strong><br>
+<div class="arabic-text">الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ</div>
+"Louvado seja Allah que nos ressuscitou após nos dar a morte."`,
+            source: "Sahih al-Bukhari 247 | Sahih Muslim 2710"
+        },
+
+        "dua estudo": {
+            answer: `<div class="ayah-box">
+<div class="arabic-text">رَبِّ زِدْنِي عِلْمًا</div>
+"Meu Senhor, aumenta-me o conhecimento!"
+<div class="ayah-ref">Alcorão 20:114</div>
+</div><br>
+<div class="hadith-box">
+<div class="hadith-narrator">Narrado por Abu Hurairah (رضي الله عنه)</div>
+"Quem seguir um caminho em busca de conhecimento, Allah facilitará um caminho para o Paraíso."
+<div class="hadith-grade">Sahih - Muslim 2699</div>
+</div>`,
+            source: "Alcorão 20:114 | Sahih Muslim 2699"
+        },
+
+        // --- SUPORTE ---
+        "suporte": {
+            answer: `<strong>🕌 Islam Moçambique - Suporte</strong><br><br>
+📞 <strong>WhatsApp/Telefone:</strong> 860407269<br><br>
+<strong>💰 Apoio Financeiro:</strong><br>
+• M-Pesa Agente Paga Fácil: <strong>1228803</strong><br>
+• Emola: <strong>860407269</strong><br>
+• Banco BIM NIB: <strong>0001000000124733562</strong><br><br>
+<em>"Quem introduzir algo bom no Islam terá recompensa por isso..." - Sahih Muslim 1017</em>`,
+            source: "Islam Moçambique | 860407269"
+        },
+
+        "doar": {
+            answer: `<strong>💚 Apoie o Islam M.bot</strong><br><br>
+Seu apoio ajuda a manter este serviço gratuito para a comunidade muçulmana.<br><br>
+<strong>Meios de Pagamento:</strong><br>
+📱 <strong>M-Pesa (Agente Paga Fácil):</strong> 1228803<br>
+📲 <strong>Emola:</strong> 860407269<br>
+🏦 <strong>Banco BIM:</strong> NIB 0001000000124733562<br><br>
+📞 <strong>Confirmar/Questões:</strong> 860407269 (WhatsApp)<br><br>
+<div class="arabic-text">مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ</div>
+"A parábola daqueles que gastam no caminho de Allah é como um grão que brota sete espigas." <em>(Al-Baqarah 2:261)</em>`,
+            source: "Islam Moçambique | 860407269"
+        }
+    };
+    </script>
+
+    <!-- ============================================ -->
+    <!-- MOTOR DO BOT - NÃO EDITE ABAIXO DESTA LINHA  -->
+    <!-- ============================================ -->
+    <script>
+    // Motor de busca
+    function findAnswer(question) {
+        const q = question.toLowerCase().trim();
+
+        // Busca exata
+        if (botMemory[q]) return botMemory[q];
+
+        // Busca por palavras
+        let bestMatch = null;
+        let bestScore = 0;
+
+        for (const [key, value] of Object.entries(botMemory)) {
+            let score = 0;
+            const keyWords = key.split(/\s+/);
+            const qWords = q.split(/\s+/).filter(w => w.length > 2);
+
+            for (const word of qWords) {
+                if (key.includes(word)) score += 2;
+            }
+
+            if (q.includes(key) || key.includes(q)) score += 5;
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestMatch = value;
             }
         }
 
-        // Initialize CodeMirror
-        function initEditor() {
-            editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
-                mode: 'python',
-                theme: 'dracula',
-                lineNumbers: true,
-                autoCloseBrackets: true,
-                matchBrackets: true,
-                indentUnit: 4,
-                tabSize: 4,
-                lineWrapping: true,
-                foldGutter: true,
-                gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-                extraKeys: {
-                    "Ctrl-Enter": runCode,
-                    "Cmd-Enter": runCode,
-                    "F5": runCode,
-                    "Ctrl-S": function(cm) { downloadCode(); return false; },
-                    "Ctrl-/": "toggleComment"
+        return bestScore >= 2 ? bestMatch : null;
+    }
+
+    // APIs externas
+    async function getPrayerTimes(city, country) {
+        try {
+            const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=2`;
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data.code === 200) return { success: true, date: data.data.date.readable, timings: data.data.timings };
+            return { success: false };
+        } catch (e) { return { success: false }; }
+    }
+
+    function calcQibla(lat, lng) {
+        const kaabaLat = 21.4225, kaabaLng = 39.8262;
+        const latR = lat * Math.PI / 180, lngR = lng * Math.PI / 180;
+        const kLatR = kaabaLat * Math.PI / 180, kLngR = kaabaLng * Math.PI / 180;
+        const y = Math.sin(kLngR - lngR);
+        const x = Math.cos(latR) * Math.tan(kLatR) - Math.sin(latR) * Math.cos(kLngR - lngR);
+        let angle = Math.atan2(y, x) * 180 / Math.PI;
+        return (angle + 360) % 360;
+    }
+
+    // UI
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const messagesArea = document.getElementById('messagesArea');
+    const typingIndicator = document.getElementById('typingIndicator');
+
+    function getTime() {
+        const now = new Date();
+        return `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    }
+
+    function escapeHTML(str) {
+        return str.replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]));
+    }
+
+    function addMessage(text, isUser) {
+        const div = document.createElement('div');
+        div.className = `message-wrapper ${isUser ? 'user' : 'bot'}`;
+        div.innerHTML = `
+            <div class="msg-avatar"><i class="fa-solid ${isUser ? 'fa-user' : 'fa-mosque'}"></i></div>
+            <div class="message-content">
+                <div class="text-box">${text}</div>
+                <span class="timestamp">${getTime()}</span>
+            </div>`;
+        messagesArea.insertBefore(div, typingIndicator);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+
+    function showTyping() { typingIndicator.style.display = 'flex'; messagesArea.scrollTop = messagesArea.scrollHeight; }
+    function hideTyping() { typingIndicator.style.display = 'none'; }
+
+    window.sendQuickReply = function(text) {
+        chatInput.value = text;
+        handleSend();
+    };
+
+    window.insertArabic = function() {
+        const phrases = ['بسم الله', 'الحمد لله', 'الله أكبر', 'سبحان الله', 'لا إله إلا الله', 'محمد رسول الله'];
+        chatInput.value += (chatInput.value ? ' ' : '') + phrases[Math.floor(Math.random() * phrases.length)];
+        chatInput.focus();
+    };
+
+    async function handleSend() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+
+        addMessage(escapeHTML(text), true);
+        chatInput.value = '';
+        showTyping();
+
+        await new Promise(r => setTimeout(r, 800));
+
+        let response = '';
+        const q = text.toLowerCase();
+
+        // Horários de oração
+        if (q.includes('oração') || q.includes('oracao') || q.includes('prayer')) {
+            if (q.includes('maputo')) {
+                const data = await getPrayerTimes('Maputo', 'MZ');
+                if (data.success) {
+                    const names = {Fajr:'Fajr',Sunrise:'Nascer do Sol',Dhuhr:'Dhuhr',Asr:'Asr',Maghrib:'Maghrib',Isha:'Isha'};
+                    response = `<strong>🕌 Horários - Maputo</strong><br><em>${data.date}</em><br><div class="prayer-grid">`;
+                    for (const [k,v] of Object.entries(data.timings)) {
+                        if (names[k]) response += `<div class="prayer-card"><div class="prayer-name">${names[k]}</div><div class="prayer-time">${v}</div></div>`;
+                    }
+                    response += `</div><div class="source-tag"><i class="fa-solid fa-clock"></i> Al-Adhan API</div>`;
                 }
-            });
-
-            // Set default code
-            editor.setValue(`# Bem-vindo ao FB Compilador Python!
-# Islam Moçambique - Programação para Todos
-
-print("Olá, Mundo!")
-print("Escreva seu código Python aqui...")
-
-# Dica: Use a área de Entrada para fornecer dados ao seu programa
-nome = input("Digite seu nome: ")
-print(f"Bem-vindo, {nome}!")`);
-
-            // Update cursor position
-            editor.on("cursorActivity", function() {
-                const pos = editor.getCursor();
-                document.getElementById('cursorPos').textContent = `Linha ${pos.line + 1}, Coluna ${pos.ch + 1}`;
-            });
-        }
-
-        // Run code
-        async function runCode() {
-            const code = editor.getValue();
-            const inputData = document.getElementById('inputArea').value;
-            
-            if (!code.trim()) {
-                appendOutput("Erro: Nenhum código para executar!", "error");
-                return;
-            }
-
-            document.getElementById('runBtn').disabled = true;
-            document.getElementById('runBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> A executar...';
-            
-            clearOutput();
-            appendOutput("=== A executar código ===\\n", "info");
-
-            try {
-                // Setup input handling
-                const inputs = inputData.split('\\n').filter(line => line.trim() !== '');
-                let inputIndex = 0;
-                
-                // Override input function
-                pyodide.globals.set("input", function(prompt) {
-                    if (prompt) {
-                        appendOutput(prompt, "info");
+            } else if (q.includes('beira')) {
+                const data = await getPrayerTimes('Beira', 'MZ');
+                if (data.success) {
+                    const names = {Fajr:'Fajr',Sunrise:'Nascer do Sol',Dhuhr:'Dhuhr',Asr:'Asr',Maghrib:'Maghrib',Isha:'Isha'};
+                    response = `<strong>🕌 Horários - Beira</strong><br><em>${data.date}</em><br><div class="prayer-grid">`;
+                    for (const [k,v] of Object.entries(data.timings)) {
+                        if (names[k]) response += `<div class="prayer-card"><div class="prayer-name">${names[k]}</div><div class="prayer-time">${v}</div></div>`;
                     }
-                    if (inputIndex < inputs.length) {
-                        return inputs[inputIndex++];
-                    }
-                    return "";
-                });
-
-                await pyodide.runPythonAsync(code);
-                appendOutput("\\n=== Execução concluída ===", "success");
-            } catch (error) {
-                appendOutput("\\n" + error.message, "error");
-                appendOutput("\\n=== Execução terminada com erros ===", "error");
-            } finally {
-                document.getElementById('runBtn').disabled = false;
-                document.getElementById('runBtn').innerHTML = '<i class="fas fa-play"></i> Executar';
-            }
-        }
-
-        // Output functions
-        function appendOutput(text, type = '') {
-            const output = document.getElementById('output');
-            const line = document.createElement('div');
-            line.className = `output-line ${type}`;
-            line.textContent = text;
-            output.appendChild(line);
-            output.scrollTop = output.scrollHeight;
-        }
-
-        function clearOutput() {
-            document.getElementById('output').innerHTML = '';
-        }
-
-        function clearEditor() {
-            if (confirm('Tem certeza que deseja limpar o editor?')) {
-                editor.setValue('');
-                editor.focus();
-            }
-        }
-
-        // Theme toggle
-        function toggleTheme() {
-            isDarkTheme = !isDarkTheme;
-            document.body.classList.toggle('light-theme');
-            
-            const icon = document.getElementById('themeIcon');
-            if (isDarkTheme) {
-                icon.className = 'fas fa-moon';
-                editor.setOption('theme', 'dracula');
+                    response += `</div><div class="source-tag"><i class="fa-solid fa-clock"></i> Al-Adhan API</div>`;
+                }
             } else {
-                icon.className = 'fas fa-sun';
-                editor.setOption('theme', 'eclipse');
+                response = `Diga a cidade (ex: "Horários Maputo" ou "Horários Beira")`;
+            }
+        }
+        // Qibla
+        else if (q.includes('qibla') || q.includes('quibla') || q.includes('direção')) {
+            if (q.includes('maputo')) {
+                const angle = calcQibla(-25.9692, 32.5732);
+                response = `<strong>🕋 Qibla - Maputo</strong><br><br>Direção: <strong>${Math.round(angle)}°</strong> a partir do Norte<br><br><div class="source-tag"><i class="fa-solid fa-compass"></i> Cálculo baseado na Kaaba</div>`;
+            } else {
+                response = `Diga a cidade (ex: "Qibla Maputo")`;
+            }
+        }
+        // Busca na memória
+        else {
+            const match = findAnswer(text);
+            if (match) {
+                response = match.answer + `<div class="source-tag"><i class="fa-solid fa-book"></i> ${match.source}</div>`;
+            } else {
+                response = `Desculpe, ainda não tenho essa resposta na minha memória.<br><br>
+                <strong>Temas que conheço:</strong> Islam, Alcorão, Sunnah, Allah, Tawhid, Shirk, Profeta Muhammad, Wudu, Ghusl, Salat, Zakat, Ramadan, Hadiths, Duas, Caridade, Paciência<br><br>
+                📞 <strong>Suporte:</strong> 860407269`;
             }
         }
 
-        // Examples
-        function toggleExamples() {
-            document.getElementById('examplesDropdown').classList.toggle('show');
-        }
+        hideTyping();
+        addMessage(response, false);
 
-        function loadExample(exampleName) {
-            if (examples[exampleName]) {
-                editor.setValue(examples[exampleName]);
-                document.getElementById('examplesDropdown').classList.remove('show');
-                editor.focus();
+        chatInput.disabled = false;
+        sendBtn.disabled = false;
+        chatInput.focus();
+    }
+
+    // Eventos
+    sendBtn.addEventListener('click', handleSend);
+    chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') handleSend(); });
+
+    // Tema
+    document.getElementById('themeToggle').addEventListener('click', () => {
+        const html = document.documentElement;
+        const icon = document.querySelector('#themeToggle i');
+        if (html.getAttribute('data-theme') === 'dark') {
+            html.removeAttribute('data-theme');
+            icon.className = 'fa-solid fa-moon';
+        } else {
+            html.setAttribute('data-theme', 'dark');
+            icon.className = 'fa-solid fa-sun';
+        }
+    });
+
+    // Sidebar
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    document.getElementById('menuToggle').addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+    });
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.style.display = 'none';
+    });
+
+    // Navegação
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', e => {
+            e.preventDefault();
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            const section = item.dataset.section;
+            const queries = {
+                quran: 'O que é Alcorão?',
+                prayer: 'Horários de oração Maputo',
+                qibla: 'Direção da Qibla Maputo',
+                duas: 'Dua para ansiedade',
+                support: 'suporte',
+                fiqh: 'Como fazer wudu?'
+            };
+            if (queries[section]) {
+                chatInput.value = queries[section];
+                handleSend();
             }
-        }
-
-        // File operations
-        function downloadCode() {
-            const code = editor.getValue();
-            const blob = new Blob([code], { type: 'text/x-python' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'main.py';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function copyCode() {
-            const code = editor.getValue();
-            navigator.clipboard.writeText(code).then(() => {
-                appendOutput("Código copiado para a área de transferência!", "success");
-            });
-        }
-
-        async function pasteCode() {
-            try {
-                const text = await navigator.clipboard.readText();
-                editor.replaceSelection(text);
-            } catch (err) {
-                appendOutput("Erro ao colar: " + err.message, "error");
-            }
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.examples-dropdown')) {
-                document.getElementById('examplesDropdown').classList.remove('show');
+            if (window.innerWidth <= 900) {
+                sidebar.classList.remove('open');
+                overlay.style.display = 'none';
             }
         });
+    });
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F5') {
-                e.preventDefault();
-                runCode();
-            }
-        });
+    // Limpar chat
+    document.getElementById('clearChatBtn').addEventListener('click', () => {
+        if (confirm('Limpar conversa?')) {
+            messagesArea.innerHTML = '';
+            messagesArea.appendChild(typingIndicator);
+            setTimeout(() => {
+                addMessage(`<strong>Assalamu Alaikum! 🌙</strong><br><br>Pergunte sobre Islam...`, false);
+            }, 300);
+        }
+    });
 
-        // Initialize
-        window.addEventListener('load', function() {
-            initEditor();
-            initPyodide();
+    // Voz
+    const voiceBtn = document.getElementById('voiceBtn');
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const rec = new SpeechRecognition();
+        rec.lang = 'pt-PT';
+        voiceBtn.addEventListener('click', () => {
+            rec.start();
+            voiceBtn.style.color = 'var(--primary)';
         });
+        rec.onresult = e => {
+            chatInput.value = e.results[0][0].transcript;
+            voiceBtn.style.color = '';
+        };
+        rec.onerror = () => { voiceBtn.style.color = ''; };
+    } else {
+        voiceBtn.style.display = 'none';
+    }
+
+    // Atualizar timestamps
+    document.querySelectorAll('[data-time="auto"]').forEach(el => el.textContent = getTime());
     </script>
 </body>
 </html>
