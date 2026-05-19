@@ -1,9 +1,3 @@
-```javascript id="6pk8vd"
-// ===============================
-// ISLAM M.BOT - CÉREBRO PRINCIPAL
-// Arquivo: brain.js
-// ===============================
-
 const BOT_BRAIN = {
 
     "islam": {
