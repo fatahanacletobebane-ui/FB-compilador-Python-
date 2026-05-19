@@ -1,132 +1,176 @@
-// ╔══════════════════════════════════════════════════════════════╗
-// ║           🧠 CÉREBRO DO ISLAM M.BOT                          ║
-// ║   ADICIONE SEU CONHECIMENTO AQUI                             ║
-// ║                                                              ║
-// ║   FORMATO:                                                   ║
-// ║   "nome-do-topico": {                                        ║
-// ║       keywords: ["palavra1", "palavra2"],                    ║
-// ║       answer: "sua resposta em HTML",                        ║
-// ║       source: "fonte islâmica",                              ║
-// ║       link: "https://..."  // OPCIONAL                       ║
-// ║   }                                                          ║
-// ╚══════════════════════════════════════════════════════════════╝
+```javascript id="6pk8vd"
+// ===============================
+// ISLAM M.BOT - CÉREBRO PRINCIPAL
+// Arquivo: brain.js
+// ===============================
 
 const BOT_BRAIN = {
 
-    "allah": {
-        keywords: ["allah", "deus", "criador", "senhor"],
-        answer: "<strong>Allah</strong> é o nome próprio do Criador em árabe. Significa "O único Deus verdadeiro digno de adoração".",
-        source: "Alcorão 2:255",
-        link: "https://quran.com/2/255"
-    },
-
     "islam": {
-        keywords: ["islam", "islão", "o que é islam", "definição de islam"],
-        answer: "O <strong>Islam</strong> significa submissão a Allah e paz. É a religião monoteísta revelada ao Profeta Muhammad (ﷺ).",
+        keywords: ["islam", "islão", "o que é o islam"],
+        answer: "Islam é a submissão sincera a Allah seguindo Sua orientação.",
         source: "Alcorão 3:19",
         link: "https://quran.com/3/19"
     },
 
-    "alcorao": {
-        keywords: ["alcorão", "corão", "quran", "livro sagrado"],
-        answer: "O <strong>Alcorão</strong> é a palavra literal de Allah, revelada ao Profeta Muhammad (ﷺ) através do Anjo Gabriel.",
-        source: "Alcorão 15:9",
-        link: "https://quran.com/15/9"
+    "allah": {
+        keywords: ["allah", "quem é allah", "deus"],
+        answer: "Allah é o Criador dos céus e da terra, perfeito e sem início nem fim.",
+        source: "Alcorão 2:255",
+        link: "https://quran.com/2/255"
     },
 
-    "profeta": {
-        keywords: ["profeta", "muhammad", "mohamed", "mensageiro"],
-        answer: "O <strong>Profeta Muhammad</strong> (ﷺ) é o último e selo dos profetas, enviado como misericórdia para toda a humanidade.",
+    "tawhid": {
+        keywords: ["tawhid", "monoteísmo", "allah único"],
+        answer: "Tawhid é acreditar que Allah é Único, sem parceiros nem semelhantes.",
+        source: "Alcorão 112:1-4",
+        link: "https://quran.com/112"
+    },
+
+    "allah_filhos": {
+        keywords: ["allah tem filhos", "deus tem filho"],
+        answer: "Allah não possui filhos nem necessita deles.",
+        source: "Alcorão 112:3",
+        link: "https://quran.com/112/3"
+    },
+
+    "jesus_islam": {
+        keywords: ["jesus no islam", "isa", "islam acredita em jesus"],
+        answer: "Isa é um mensageiro honrado enviado por Allah.",
+        source: "Alcorão 4:171",
+        link: "https://quran.com/4/171"
+    },
+
+    "jesus_deus": {
+        keywords: ["jesus é deus", "jesus filho de deus"],
+        answer: "Isa não é Deus, mas um servo e mensageiro de Allah.",
+        source: "Alcorão 5:72",
+        link: "https://quran.com/5/72"
+    },
+
+    "muhammad": {
+        keywords: ["muhammad", "maomé", "mensageiro"],
+        answer: "Muhammad foi enviado por Allah como guia para humanidade.",
+        source: "Alcorão 34:28",
+        link: "https://quran.com/34/28"
+    },
+
+    "ultimo_profeta": {
+        keywords: ["último profeta", "muhammad último profeta"],
+        answer: "Muhammad é o selo e último dos profetas.",
         source: "Alcorão 33:40",
         link: "https://quran.com/33/40"
     },
 
-    "wudu": {
-        keywords: ["wudu", "ablusão", "ablusao", "como lavar", "purificação"],
-        answer: "O <strong>Wudu</strong> é obrigatório antes da oração. Passos: 1.Intenção 2.Bismillah 3.Lavar mãos 3x 4.Enxaguar boca/nariz 3x 5.Lavar rosto 3x 6.Lavar braços até cotovelos 3x 7.Passar mãos na cabeça 8.Limpar ouvidos 9.Lavar pés 3x",
-        source: "Sahih al-Bukhari 191",
-        link: "https://sunnah.com/bukhari/4/4"
+    "alcorao": {
+        keywords: ["alcorão", "corão", "quran"],
+        answer: "O Alcorão é a palavra revelada por Allah como guia para humanidade.",
+        source: "Alcorão 15:9",
+        link: "https://quran.com/15/9"
     },
 
-    "salat": {
-        keywords: ["salat", "oração", "oracao", "rezar", "salah", "namaz"],
-        answer: "A <strong>Salat</strong> é obrigatória 5 vezes ao dia: Fajr (2 rak'ahs), Dhuhr (4), Asr (4), Maghrib (3), Isha (4).",
-        source: "Alcorão 4:103",
-        link: "https://quran.com/4/103"
+    "alcorao_alterado": {
+        keywords: ["alcorão alterado", "corão alterado"],
+        answer: "Allah prometeu preservar o Alcorão de alterações.",
+        source: "Alcorão 15:9",
+        link: "https://quran.com/15/9"
     },
 
-    "zakat": {
-        keywords: ["zakat", "zakat", "caridade obrigatória", "pobre", "2.5%"],
-        answer: "A <strong>Zakat</strong> é obrigatória: 2.5% da riqueza acima do Nisab após 1 ano lunar. São 8 grupos que podem receber.",
-        source: "Alcorão 9:60",
-        link: "https://quran.com/9/60"
+    "anjos": {
+        keywords: ["anjos", "malaika"],
+        answer: "Os anjos são criaturas de luz que obedecem sempre a Allah.",
+        source: "Alcorão 66:6",
+        link: "https://quran.com/66/6"
     },
 
-    "ramadan": {
-        keywords: ["ramadan", "ramadã", "jejum", "sawm", "mês do jejum"],
-        answer: "O <strong>Jejum de Ramadã</strong> é obrigatório. Abster-se de comida, bebida e relações desde Fajr até Maghrib.",
-        source: "Alcorão 2:183",
-        link: "https://quran.com/2/183"
+    "anjos_livre_arbitrio": {
+        keywords: ["anjos têm livre arbítrio", "anjos pecam"],
+        answer: "Os anjos não desobedecem Allah e cumprem Suas ordens.",
+        source: "Alcorão 66:6",
+        link: "https://quran.com/66/6"
     },
 
-    "caridade": {
-        keywords: ["caridade", "sadaqah", "sadaqa", "doar", "doação", "ajudar"],
-        answer: "O Profeta (ﷺ) disse: 'A caridade não diminui a riqueza.' Sorrir para o irmão também é caridade.",
-        source: "Sahih Muslim 2588",
-        link: "https://sunnah.com/muslim/32/24"
+    "jinn": {
+        keywords: ["jinn", "djinn", "gênios"],
+        answer: "Os jinn são criaturas criadas do fogo e possuem livre arbítrio.",
+        source: "Alcorão 55:15",
+        link: "https://quran.com/55/15"
     },
 
-    "paciencia": {
-        keywords: ["paciência", "paciencia", "sabr", "esperar", "calma"],
-        answer: "O Profeta (ﷺ) disse: 'Quão maravilhosa é a situação do crente! Se algo bom acontece, agradece; se algo mal, é paciente.'",
-        source: "Sahih Muslim 2999",
-        link: "https://sunnah.com/muslim/45/57"
+    "jinn_prejudicar": {
+        keywords: ["jinn prejudicar humanos", "ataque de jinn"],
+        answer: "Alguns jinn podem tentar prejudicar humanos com permissão de Allah.",
+        source: "Alcorão 72:6",
+        link: "https://quran.com/72/6"
     },
 
-    "intencao": {
-        keywords: ["intenção", "intencao", "niyyah", "niyya", "ações por intenções"],
-        answer: "O Profeta (ﷺ) disse: 'As ações são julgadas pelas intenções, e cada pessoa terá o que pretendeu.'",
-        source: "Sahih al-Bukhari 1",
-        link: "https://sunnah.com/bukhari/1/1"
+    "qadar": {
+        keywords: ["qadar", "destino", "predestinação"],
+        answer: "Tudo ocorre pelo conhecimento e decreto de Allah.",
+        source: "Alcorão 54:49",
+        link: "https://quran.com/54/49"
     },
 
-    "ansiedade": {
-        keywords: ["ansiedade", "medo", "preocupação", "preocupacao", "tristeza"],
-        answer: "A Dua de Yunus: 'Não há divindade exceto Tu; glorificado sejas! Eu fui dos injustos.' Também: 'Hasbunallahu wa ni'mal wakeel' (Allah é suficiente).",
-        source: "Alcorão 21:87",
-        link: "https://quran.com/21/87"
+    "livre_arbitrio": {
+        keywords: ["livre arbítrio", "escolhas humanas"],
+        answer: "Allah conhece tudo, mas o ser humano escolhe suas ações.",
+        source: "Alcorão 18:29",
+        link: "https://quran.com/18/29"
     },
 
-    "sono": {
-        keywords: ["sono", "dormir", "deitar", "antes de dormir", "noite"],
-        answer: "Antes de dormir: 'Em Teu nome, ó Allah, eu morro e vivo.' Ao acordar: 'Louvado seja Allah que nos ressuscitou.'",
-        source: "Sahih al-Bukhari 247",
-        link: "https://sunnah.com/bukhari/80/64"
+    "inferno_eterno": {
+        keywords: ["inferno eterno", "jahannam eterno"],
+        answer: "O inferno é uma punição preparada para descrentes persistentes.",
+        source: "Alcorão 4:169",
+        link: "https://quran.com/4/169"
     },
 
-    "estudo": {
-        keywords: ["estudo", "conhecimento", "aprender", "saber", "ilmu"],
-        answer: "'Meu Senhor, aumenta-me o conhecimento!' (Rabbi zidni ilma). Quem busca conhecimento, Allah facilita caminho para o Paraíso.",
-        source: "Alcorão 20:114",
-        link: "https://quran.com/20/114"
+    "quem_vai_paraiso": {
+        keywords: ["quem vai para o paraíso", "jannah"],
+        answer: "Entrarão no Paraíso os que crerem e praticarem boas ações.",
+        source: "Alcorão 2:82",
+        link: "https://quran.com/2/82"
     },
 
-    "suporte": {
-        keywords: ["suporte", "ajuda", "contacto", "contato", "apoio", "islam moçambique", "860407269"],
-        answer: "<strong>🕌 Islam Moçambique - Suporte</strong><br><br>📞 <strong>WhatsApp/Telefone:</strong> 860407269<br><br><strong>💰 Apoio Financeiro:</strong><br>• M-Pesa Agente Paga Fácil: <strong>1228803</strong><br>• Emola: <strong>860407269</strong><br>• Banco BIM NIB: <strong>0001000000124733562</strong>",
-        source: "Islam Moçambique",
-        link: "https://wa.me/258860407269"
+    "verdadeiro_crente": {
+        keywords: ["verdadeiro crente", "muçulmano verdadeiro"],
+        answer: "O verdadeiro crente obedece Allah sinceramente.",
+        source: "Alcorão 8:2",
+        link: "https://quran.com/8/2"
     },
 
-    "doar": {
-        keywords: ["doar", "doação", "donativo", "contribuir", "apoiar"],
-        answer: "<strong>💚 Apoie o Islam M.bot</strong><br><br><strong>Meios de Pagamento:</strong><br>📱 <strong>M-Pesa (Agente Paga Fácil):</strong> 1228803<br>📲 <strong>Emola:</strong> 860407269<br>🏦 <strong>Banco BIM:</strong> NIB 0001000000124733562<br><br>📞 <strong>Confirmar/Questões:</strong> 860407269 (WhatsApp)",
-        source: "Islam Moçambique",
-        link: "https://wa.me/258860407269"
+    "kufr": {
+        keywords: ["kufr", "descrença", "incredulidade"],
+        answer: "Kufr é rejeitar a verdade após ela ter sido esclarecida.",
+        source: "Alcorão 2:6",
+        link: "https://quran.com/2/6"
+    },
+
+    "dua_ansiedade": {
+        keywords: ["ansiedade", "tristeza", "dua ansiedade"],
+        answer: `
+        <div class="arabic-text">
+        اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ
+        </div>
+        <div class="hadith-box">
+            <div class="hadith-narrator">Dua contra ansiedade e tristeza</div>
+            Ó Allah, eu busco refúgio em Ti contra ansiedade e tristeza.
+            <div class="hadith-grade">Sahih</div>
+        </div>`,
+        source: "Sahih al-Bukhari",
+        link: "https://sunnah.com/bukhari"
+    },
+
+    "bismillah": {
+        keywords: ["bismillah", "basmala"],
+        answer: `
+        <div class="arabic-text">
+        بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+        </div>
+        Em nome de Allah, o Misericordioso, o Compassivo.`,
+        source: "Alcorão 1:1",
+        link: "https://quran.com/1/1"
     }
 
-    // ═══ ADICIONE SEUS TÓPICOS AQUI ═══
-    // Copie um bloco acima, cole aqui e altere
-    // Não esqueça: vírgula no final de cada bloco, exceto o último
-
 };
+```
