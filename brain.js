@@ -56,7 +56,7 @@ const BOT_BRAIN = {
     },
 
     "zakat": {
-        keywords: ["zakat", "zakat", "caridade obrigatória", "pobre", "2.5%"],
+        keywords: ["zakat", "zakah", "caridade obrigatória", "pobre", "2.5%"],
         answer: "A <strong>Zakat</strong> é obrigatória: 2.5% da riqueza acima do Nisab após 1 ano lunar. São 8 grupos que podem receber.",
         source: "Alcorão 9:60",
         link: "https://quran.com/9/60"
