@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Islam M.bot</title>
+    <title>Islam M.bot - Islam Moçambique</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -77,8 +77,14 @@
         .send-btn { background-color: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: var(--transition); box-shadow: 0 4px 10px rgba(26,95,63,0.2); }
         .send-btn:hover { background-color: var(--primary-light); transform: scale(1.05); }
         .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback-btns { display: flex; gap: 10px; margin-top: 10px; }
+        .feedback-btn { background: none; border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
+        .feedback-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .feedback-btn.liked { background: var(--primary); color: white; }
+        .unanswered-note { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 12px; color: #856404; }
         .arabic-text { font-family: 'Amiri', serif; font-size: 20px; text-align: right; direction: rtl; margin: 10px 0; padding: 12px; background: rgba(26,95,63,0.05); border-radius: 8px; line-height: 1.8; }
         .source-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: white; font-size: 11px; padding: 4px 10px; border-radius: 12px; margin-top: 8px; }
+        .source-tag i { font-size: 10px; }
         .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .quick-reply { background: var(--primary-light); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: var(--transition); }
         .quick-reply:hover { background: var(--primary); transform: translateY(-1px); }
@@ -149,24 +155,20 @@
         </header>
 
         <section class="messages-area" id="messagesArea">
-            <div class="message-wrapper bot">
+            <!-- SAUDAÇÃO INICIAL -->
+            <div class="message-wrapper bot" id="welcomeMsg">
                 <div class="msg-avatar"><i class="fa-solid fa-mosque"></i></div>
                 <div class="message-content">
                     <div class="text-box">
-                        <strong>Assalamu Alaikum! 🌙</strong><br><br>
-                        Sou o Islam M.bot, criado por <strong>Islam Moçambique</strong>.<br><br>
-                        Pergunte-me sobre Islam, Alcorão, Sunnah, Fiqh, orações...<br><br>
-                        <div class="quick-replies">
-                            <button class="quick-reply" onclick="sendQuickReply('O que é Islam?')">Islam</button>
-                            <button class="quick-reply" onclick="sendQuickReply('O que é Alcorão?')">Alcorão</button>
-                            <button class="quick-reply" onclick="sendQuickReply('Como fazer wudu?')">Wudu</button>
-                            <button class="quick-reply" onclick="sendQuickReply('Horários de oração Maputo')">Orações</button>
-                            <button class="quick-reply" onclick="sendQuickReply('Hadith sobre caridade')">Caridade</button>
-                        </div>
+                        <strong>Assalamu Alaikum Warahmatullahi Wabarakatuh! 🌙</strong><br><br>
+                        Eu sou o <strong>Islam M.Bot</strong>, estou aqui para responder suas dúvidas sobre o Islam.<br><br>
+                        <em>Pergunte-me sobre Alcorão, Sunnah, Fiqh, Aqeedah, orações, duas...</em>
                     </div>
                     <span class="timestamp" data-time="auto"></span>
                 </div>
             </div>
+
+            <!-- INDICADOR DE PROCESSAMENTO -->
             <div class="message-wrapper bot" id="typingIndicator" style="display: none;">
                 <div class="msg-avatar"><i class="fa-solid fa-mosque"></i></div>
                 <div class="message-content">
@@ -178,7 +180,7 @@
         <footer class="input-area">
             <div class="input-wrapper">
                 <button class="input-action-btn" onclick="insertArabic()"><i class="fa-solid fa-star-and-crescent"></i></button>
-                <input type="text" class="chat-input" placeholder="Pergunte sobre Islam..." id="chatInput">
+                <input type="text" class="chat-input" placeholder="Escreva sua pergunta..." id="chatInput">
                 <div class="input-actions">
                     <button class="input-action-btn" id="voiceBtn"><i class="fa-solid fa-microphone"></i></button>
                 </div>
@@ -187,339 +189,45 @@
         </footer>
     </main>
 
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- PASTA DE MEMÓRIA - ADICIONE SEU CONHECIMENTO AQUI     -->
-    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- CÉREBRO SEPARADO -->
+    <script src="brain.js"></script>
+
+    <!-- MOTOR DO BOT -->
     <script>
-    // ============================================
-    // MEMÓRIA DO BOT - EDITE AQUI
-    // ============================================
-    // Adicione novos tópicos seguindo o formato:
-    // "pergunta ou palavra-chave": {
-    //     answer: "sua resposta em HTML",
-    //     source: "fonte islâmica"
-    // }
+    // Verifica se o cérebro carregou
+    if (typeof BOT_BRAIN === 'undefined') {
+        console.error('ERRO: brain.js não carregou!');
+        alert('Erro: O arquivo brain.js não foi encontrado. Certifique-se de que brain.js está na mesma pasta.');
+    }
 
-    const botMemory = {
-        // --- AQEEDAH (CREDO) ---
-        "o que é islam": {
-            answer: `O <strong>Islam</strong> é a religião monoteísta revelada por Allah ao Profeta Muhammad (ﷺ). Significa "submissão" a Allah.<br><br>
-<strong>5 Pilares:</strong><br>
-1. Shahada (testemunho de fé)<br>
-2. Salat (oração 5x ao dia)<br>
-3. Zakat (caridade obrigatória)<br>
-4. Sawm (jejum de Ramadã)<br>
-5. Hajj (peregrinação)<br><br>
-<div class="arabic-text">إِنَّ الدِّينَ عِندَ اللَّهِ الْإِسْلَامُ</div>
-"Em verdade, a religião aceita por Allah é o Islam." <em>(Al-Imran 3:19)</em>`,
-            source: "Alcorão 3:19"
-        },
-
-        "o que é alcorão": {
-            answer: `O <strong>Alcorão</strong> é a palavra literal de Allah, revelada ao Profeta Muhammad (ﷺ) através do Anjo Gabriel.<br><br>
-• 114 Suras (capítulos)<br>
-• 6.236 versículos (Ayahs)<br>
-• Revelado em 23 anos<br>
-• Preservado intacto desde a revelação<br><br>
-<div class="arabic-text">إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ</div>
-"Em verdade, fomos Nós que revelamos o Alcorão, e somos seu Guardião." <em>(Al-Hijr 15:9)</em>`,
-            source: "Alcorão 15:9"
-        },
-
-        "o que é sunnah": {
-            answer: `A <strong>Sunnah</strong> é o conjunto das práticas, palavras e aprovações do Profeta Muhammad (ﷺ). É a segunda fonte da legislação islâmica.<br><br>
-<strong>Tipos:</strong><br>
-• Sunnah Qawliyyah (palavras)<br>
-• Sunnah Fi'liyyah (ações)<br>
-• Sunnah Taqririyyah (aprovações)<br><br>
-<div class="hadith-box">
-<div class="hadith-narrator">Narrado por Al-Miqdam (رضي الله عنه)</div>
-"Deixei entre vós duas coisas: se as segurardes, nunca vos desviareis: o Livro de Allah e a minha Sunnah."
-<div class="hadith-grade">Sahih - Al-Muwatta 1661</div>
-</div>`,
-            source: "Al-Muwatta 1661 | Mishkat al-Masabih 186"
-        },
-
-        "allah": {
-            answer: `<strong>Allah</strong> é o nome próprio do Criador em árabe. Significa "O único Deus verdadeiro digno de adoração".<br><br>
-<strong>Atributos:</strong><br>
-• Ar-Rahman (O Clemente)<br>
-• Ar-Rahim (O Misericordioso)<br>
-• Al-Malik (O Rei)<br>
-• Al-Quddus (O Santo)<br>
-• Al-Aziz (O Todo-Poderoso)<br><br>
-<div class="arabic-text">قُلْ هُوَ اللَّهُ أَحَدٌ ۝ اللَّهُ الصَّمَدُ ۝ لَمْ يَلِدْ وَلَمْ يُولَدْ ۝ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ</div>
-"Dize: Ele é Allah, o Único! Allah, o Absoluto! Não gerou, nem foi gerado! E não há ninguém igual a Ele!" <em>(Al-Ikhlas 112)</em>`,
-            source: "Alcorão 112"
-        },
-
-        "tawhid": {
-            answer: `O <strong>Tawhid</strong> é a crença na unicidade absoluta de Allah. É a fundação do Islam.<br><br>
-<strong>3 Tipos:</strong><br>
-1. <strong>Rububiyyah</strong> - Allah é o único Criador<br>
-2. <strong>Uluhiyyah</strong> - Toda adoração é só para Allah<br>
-3. <strong>Asma wa Sifat</strong> - Nomes e atributos de Allah<br><br>
-<div class="arabic-text">وَإِلَٰهُكُمْ إِلَٰهٌ وَاحِدٌ ۖ لَّا إِلَٰهَ إِلَّا هُوَ الرَّحْمَٰنُ الرَّحِيمُ</div>
-"E vosso Deus é um único Deus; não há divindade exceto Ele." <em>(Al-Baqarah 2:163)</em>`,
-            source: "Alcorão 2:163"
-        },
-
-        "shirk": {
-            answer: `O <strong>Shirk</strong> é associar parceiros a Allah. É o maior pecado no Islam.<br><br>
-<strong>Tipos:</strong><br>
-• <strong>Shirk Akbar</strong> - Adorar ídolos, invocar mortos<br>
-• <strong>Shirk Asghar</strong> - Ostentação (Riya), jurar por outros<br><br>
-<div class="arabic-text">إِنَّ اللَّهَ لَا يَغْفِرُ أَن يُشْرَكَ بِهِ وَيَغْفِرُ مَا دُونَ ذَٰلِكَ لِمَن يَشَاءُ</div>
-"Allah não perdoa que se Lhe associe parceiros." <em>(An-Nisa 4:48)</em>`,
-            source: "Alcorão 4:48"
-        },
-
-        "profeta": {
-            answer: `O <strong>Profeta Muhammad</strong> (ﷺ) é o último e selo dos profetas.<br><br>
-• Nascido em Meca, 570 d.C.<br>
-• Primeira revelação aos 40 anos<br>
-• Migrou para Madinah em 622 d.C.<br>
-• Faleceu em 632 d.C.<br><br>
-<div class="arabic-text">مَّا كَانَ مُحَمَّدٌ أَبَا أَحَدٍ مِّن رِّجَالِكُمْ وَلَٰكِن رَّسُولَ اللَّهِ وَخَاتَمَ النَّبِيِّينَ</div>
-"Muhammad é o Mensageiro de Allah e o Selo dos Profetas." <em>(Al-Ahzab 33:40)</em>`,
-            source: "Alcorão 33:40"
-        },
-
-        // --- FIQH ---
-        "wudu": {
-            answer: `O <strong>Wudu</strong> é obrigatório antes da oração.<br><br>
-<strong>Passos:</strong><br>
-1. Intenção (Niyyah)<br>
-2. Dizer "Bismillah"<br>
-3. Lavar mãos 3x<br>
-4. Enxaguar boca 3x<br>
-5. Lavar nariz 3x<br>
-6. Lavar rosto 3x<br>
-7. Lavar braços até cotovelos 3x<br>
-8. Passar mãos na cabeça<br>
-9. Limpar ouvidos<br>
-10. Lavar pés 3x<br><br>
-<strong>Quebra wudu:</strong><br>
-• Impurezas (urina, fezes, gases)<br>
-• Sono profundo<br>
-• Tocar órgãos genitais<br><br>
-<div class="hadith-box">
-<div class="hadith-narrator">Narrado por Humran, servo de Uthman</div>
-"Uthman lavou as mãos três vezes... o rosto três vezes... os braços três vezes..."
-<div class="hadith-grade">Sahih - Bukhari 191 & Muslim 225</div>
-</div>`,
-            source: "Sahih al-Bukhari 191 | Sahih Muslim 225"
-        },
-
-        "ghusl": {
-            answer: `O <strong>Ghusl</strong> (banho ritual) é obrigatório após:<br>
-• Relações conjugais<br>
-• Ejaculação<br>
-• Menstruação<br>
-• Pós-parto<br><br>
-<strong>Passos:</strong><br>
-1. Intenção<br>
-2. Lavar mãos 3x<br>
-3. Limpar área privada<br>
-4. Fazer wudu (exceto pés)<br>
-5. Deitar água na cabeça 3x<br>
-6. Lavar corpo direito, depois esquerdo<br>
-7. Lavar pés<br><br>
-<div class="hadith-box">
-<div class="hadith-narrator">Narrado por Aisha (رضي الله عنها)</div>
-"O Profeta (ﷺ) fazia ghusl começando pelas mãos, depois wudu, depois lavava a cabeça..."
-<div class="hadith-grade">Sahih - Muslim 316</div>
-</div>`,
-            source: "Sahih Muslim 316"
-        },
-
-        "salat": {
-            answer: `A <strong>Salat</strong> (oração) é obrigatória 5 vezes ao dia.<br><br>
-<strong>5 Orações:</strong><br>
-1. <strong>Fajr</strong> - 2 rak'ahs (amanhecer)<br>
-2. <strong>Dhuhr</strong> - 4 rak'ahs (meio-dia)<br>
-3. <strong>Asr</strong> - 4 rak'ahs (tarde)<br>
-4. <strong>Maghrib</strong> - 3 rak'ahs (pôr do sol)<br>
-5. <strong>Isha</strong> - 4 rak'ahs (noite)<br><br>
-<strong>Condições:</strong><br>
-• Wudu/Ghusl<br>
-• Cobertura Awrah<br>
-• Direção Qibla<br>
-• Intenção<br>
-• Horário correto<br><br>
-<div class="arabic-text">إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا</div>
-"A oração é obrigação em horários determinados." <em>(An-Nisa 4:103)</em>`,
-            source: "Alcorão 4:103 | Sahih Muslim 85"
-        },
-
-        "zakat": {
-            answer: `A <strong>Zakat</strong> é obrigatória: <strong>2.5%</strong> da riqueza acima do Nisab após 1 ano.<br><br>
-<strong>Quem recebe (8 grupos):</strong><br>
-1. Os pobres (Fuqara)<br>
-2. Os necessitados (Masakin)<br>
-3. Administradores (Amilina)<br>
-4. Corações inclinados (Muallafah)<br>
-5. Libertar escravos<br>
-6. Endividados (Gharimin)<br>
-7. Na causa de Allah<br>
-8. Viajantes necessitados<br><br>
-<div class="arabic-text">خُذْ مِنْ أَمْوَالِهِمْ صَدَقَةً تُطَهِّرُهُمْ وَتُزَكِّيهِم بِهَا</div>
-"Toma de suas riquezas uma caridade para purificá-los." <em>(At-Tawbah 9:103)</em>`,
-            source: "Alcorão 9:60, 9:103"
-        },
-
-        "ramadan": {
-            answer: `O <strong>Jejum de Ramadã</strong> é obrigatório para muçulmanos adultos saudáveis.<br><br>
-<strong>Regras:</strong><br>
-• Abster-se de comida, bebida e relações desde Fajr até Maghrib<br>
-• Intenção antes do Fajr<br><br>
-<strong>Isentos:</strong><br>
-• Doentes, viajantes<br>
-• Grávidas/amamentando (com medo)<br>
-• Idosos fracos<br>
-• Menstruantes<br><br>
-<div class="arabic-text">يَا أَيُّهَا الَّذِينَ آمَنُوا كُتِبَ عَلَيْكُمُ الصِّيَامُ كَمَا كُتِبَ عَلَى الَّذِينَ مِن قَبْلِكُمْ لَعَلَّكُمْ تَتَّقُونَ</div>
-"O jejum vos foi prescrito para que sejais piedosos." <em>(Al-Baqarah 2:183)</em>`,
-            source: "Alcorão 2:183-185"
-        },
-
-        // --- HADITHS ---
-        "hadith caridade": {
-            answer: `<div class="hadith-box">
-<div class="hadith-narrator">Narrado por Abu Hurairah (رضي الله عنه)</div>
-"O Mensageiro de Allah (ﷺ) disse: 'A caridade não diminui a riqueza...'"
-<div class="hadith-grade">Sahih - Muslim 2588</div>
-</div><br>
-<div class="hadith-box">
-<div class="hadith-narrator">Narrado por Abu Dharr (رضي الله عنه)</div>
-"Sorrir para o seu irmão é caridade. Ordenar o bem e proibir o mal é caridade. Guiar alguém é caridade."
-<div class="hadith-grade">Sahih - Tirmidhi 1956</div>
-</div>`,
-            source: "Sahih Muslim 2588 | Tirmidhi 1956"
-        },
-
-        "hadith paciência": {
-            answer: `<div class="hadith-box">
-<div class="hadith-narrator">Narrado por Anas ibn Malik (رضي الله عنه)</div>
-"O Profeta (ﷺ) disse: 'Quão maravilhosa é a situação do crente! Tudo é bom para ele: se algo bom lhe acontece, agradece; se algo mal, é paciente.'"
-<div class="hadith-grade">Sahih - Muslim 2999</div>
-</div><br>
-<div class="hadith-box">
-<div class="hadith-narrator">Narrado por Abu Sa'id al-Khudri (رضي الله عنه)</div>
-"O Profeta (ﷺ) disse: 'Quem for paciente, Allah não lhe dará recompensa menor do que o Paraíso.'"
-<div class="hadith-grade">Sahih - Bukhari 6024 & Muslim 2806</div>
-</div>`,
-            source: "Sahih Muslim 2999 | Sahih al-Bukhari 6024"
-        },
-
-        "hadith intenção": {
-            answer: `<div class="hadith-box">
-<div class="hadith-narrator">Narrado por Umar ibn al-Khattab (رضي الله عنه)</div>
-"O Profeta (ﷺ) disse: 'As ações são julgadas pelas intenções, e cada pessoa terá o que pretendeu.'"
-<div class="hadith-grade">Sahih - Bukhari 1 & Muslim 1907</div>
-</div>`,
-            source: "Sahih al-Bukhari 1 | Sahih Muslim 1907"
-        },
-
-        // --- DUAS ---
-        "dua ansiedade": {
-            answer: `<div class="ayah-box">
-<div class="arabic-text">لَا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ</div>
-"Não há divindade exceto Tu; glorificado sejas! Eu fui dos injustos."
-<div class="ayah-ref">Alcorão 21:87 (Dua de Yunus)</div>
-</div><br>
-<strong>Outras Duas:</strong><br>
-• <em>"Hasbunallahu wa ni'mal wakeel"</em> - Allah é suficiente (3:173)<br>
-• <em>"Allahumma inni a'udhu bika minal-hammi wal-hazani"</em> - Refúgio da ansiedade (Bukhari 6363)`,
-            source: "Alcorão 21:87 | Bukhari 6363"
-        },
-
-        "dua sono": {
-            answer: `<div class="ayah-box">
-<div class="arabic-text">بِسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا</div>
-"Em Teu nome, ó Allah, eu morro e vivo."
-<div class="ayah-ref">Sahih al-Bukhari 247 & Muslim 2710</div>
-</div><br>
-<strong>Ao acordar:</strong><br>
-<div class="arabic-text">الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ</div>
-"Louvado seja Allah que nos ressuscitou após nos dar a morte."`,
-            source: "Sahih al-Bukhari 247 | Sahih Muslim 2710"
-        },
-
-        "dua estudo": {
-            answer: `<div class="ayah-box">
-<div class="arabic-text">رَبِّ زِدْنِي عِلْمًا</div>
-"Meu Senhor, aumenta-me o conhecimento!"
-<div class="ayah-ref">Alcorão 20:114</div>
-</div><br>
-<div class="hadith-box">
-<div class="hadith-narrator">Narrado por Abu Hurairah (رضي الله عنه)</div>
-"Quem seguir um caminho em busca de conhecimento, Allah facilitará um caminho para o Paraíso."
-<div class="hadith-grade">Sahih - Muslim 2699</div>
-</div>`,
-            source: "Alcorão 20:114 | Sahih Muslim 2699"
-        },
-
-        // --- SUPORTE ---
-        "suporte": {
-            answer: `<strong>🕌 Islam Moçambique - Suporte</strong><br><br>
-📞 <strong>WhatsApp/Telefone:</strong> 860407269<br><br>
-<strong>💰 Apoio Financeiro:</strong><br>
-• M-Pesa Agente Paga Fácil: <strong>1228803</strong><br>
-• Emola: <strong>860407269</strong><br>
-• Banco BIM NIB: <strong>0001000000124733562</strong><br><br>
-<em>"Quem introduzir algo bom no Islam terá recompensa por isso..." - Sahih Muslim 1017</em>`,
-            source: "Islam Moçambique | 860407269"
-        },
-
-        "doar": {
-            answer: `<strong>💚 Apoie o Islam M.bot</strong><br><br>
-Seu apoio ajuda a manter este serviço gratuito para a comunidade muçulmana.<br><br>
-<strong>Meios de Pagamento:</strong><br>
-📱 <strong>M-Pesa (Agente Paga Fácil):</strong> 1228803<br>
-📲 <strong>Emola:</strong> 860407269<br>
-🏦 <strong>Banco BIM:</strong> NIB 0001000000124733562<br><br>
-📞 <strong>Confirmar/Questões:</strong> 860407269 (WhatsApp)<br><br>
-<div class="arabic-text">مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ</div>
-"A parábola daqueles que gastam no caminho de Allah é como um grão que brota sete espigas." <em>(Al-Baqarah 2:261)</em>`,
-            source: "Islam Moçambique | 860407269"
-        }
-    };
-    </script>
-
-    <!-- ============================================ -->
-    <!-- MOTOR DO BOT - NÃO EDITE ABAIXO DESTA LINHA  -->
-    <!-- ============================================ -->
-    <script>
-    // Motor de busca
+    // Motor de busca no cérebro
     function findAnswer(question) {
+        // Se o cérebro não existe, retorna null imediatamente
+        if (typeof BOT_BRAIN === 'undefined') return null;
+
         const q = question.toLowerCase().trim();
-
-        // Busca exata
-        if (botMemory[q]) return botMemory[q];
-
-        // Busca por palavras
         let bestMatch = null;
         let bestScore = 0;
 
-        for (const [key, value] of Object.entries(botMemory)) {
+        for (const [key, topic] of Object.entries(BOT_BRAIN)) {
             let score = 0;
-            const keyWords = key.split(/\s+/);
-            const qWords = q.split(/\s+/).filter(w => w.length > 2);
-
-            for (const word of qWords) {
-                if (key.includes(word)) score += 2;
+            // Verifica keywords
+            if (topic.keywords) {
+                for (const keyword of topic.keywords) {
+                    if (q.includes(keyword.toLowerCase())) score += keyword.length;
+                }
             }
-
-            if (q.includes(key) || key.includes(q)) score += 5;
+            // Verifica se a pergunta contém a chave
+            if (q.includes(key.toLowerCase())) score += 5;
 
             if (score > bestScore) {
                 bestScore = score;
-                bestMatch = value;
+                bestMatch = topic;
             }
         }
 
-        return bestScore >= 2 ? bestMatch : null;
+        // Precisa de pelo menos 3 pontos para ser considerado match
+        return bestScore >= 3 ? bestMatch : null;
     }
 
     // APIs externas
@@ -558,31 +266,56 @@ Seu apoio ajuda a manter este serviço gratuito para a comunidade muçulmana.<br
         return str.replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]));
     }
 
-    function addMessage(text, isUser) {
+    function addMessage(text, isUser, showFeedback) {
         const div = document.createElement('div');
         div.className = `message-wrapper ${isUser ? 'user' : 'bot'}`;
         div.innerHTML = `
             <div class="msg-avatar"><i class="fa-solid ${isUser ? 'fa-user' : 'fa-mosque'}"></i></div>
             <div class="message-content">
                 <div class="text-box">${text}</div>
+                ${showFeedback ? `
+                <div class="feedback-btns">
+                    <button class="feedback-btn like-btn" onclick="handleLike(this)"><i class="fa-solid fa-thumbs-up"></i> Útil</button>
+                    <button class="feedback-btn dislike-btn" onclick="handleDislike(this)"><i class="fa-solid fa-thumbs-down"></i> Não útil</button>
+                </div>` : ''}
                 <span class="timestamp">${getTime()}</span>
             </div>`;
         messagesArea.insertBefore(div, typingIndicator);
         messagesArea.scrollTop = messagesArea.scrollHeight;
+        return div;
     }
 
     function showTyping() { typingIndicator.style.display = 'flex'; messagesArea.scrollTop = messagesArea.scrollHeight; }
     function hideTyping() { typingIndicator.style.display = 'none'; }
 
-    window.sendQuickReply = function(text) {
-        chatInput.value = text;
-        handleSend();
-    };
-
     window.insertArabic = function() {
         const phrases = ['بسم الله', 'الحمد لله', 'الله أكبر', 'سبحان الله', 'لا إله إلا الله', 'محمد رسول الله'];
         chatInput.value += (chatInput.value ? ' ' : '') + phrases[Math.floor(Math.random() * phrases.length)];
         chatInput.focus();
+    };
+
+    window.handleLike = function(btn) {
+        btn.classList.add('liked');
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Jazakallahu Khair';
+        btn.disabled = true;
+        if (btn.nextElementSibling) btn.nextElementSibling.style.display = 'none';
+
+        setTimeout(() => {
+            addMessage('<strong>Jazakallahu Khair! 🤲</strong><br>Estou aqui para ajudar. Em que mais posso ajudar?', false, false);
+        }, 500);
+    };
+
+    window.handleDislike = function(btn) {
+        if (btn.previousElementSibling) btn.previousElementSibling.style.display = 'none';
+        btn.style.display = 'none';
+
+        const noteDiv = document.createElement('div');
+        noteDiv.className = 'unanswered-note';
+        noteDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <strong>Nota para o criador:</strong> Esta pergunta não foi respondida com sucesso. Por favor, envie esta pergunta para o WhatsApp <strong>860407269</strong> para atualizar o conhecimento do bot.';
+
+        // Adiciona a nota após os botões
+        const feedbackContainer = btn.parentElement;
+        feedbackContainer.appendChild(noteDiv);
     };
 
     async function handleSend() {
@@ -592,75 +325,95 @@ Seu apoio ajuda a manter este serviço gratuito para a comunidade muçulmana.<br
         chatInput.disabled = true;
         sendBtn.disabled = true;
 
-        addMessage(escapeHTML(text), true);
+        // Mostra pergunta do usuário
+        addMessage(escapeHTML(text), true, false);
         chatInput.value = '';
+
+        // MOSTRA SINAL DE PROCESSAMENTO
         showTyping();
 
-        await new Promise(r => setTimeout(r, 800));
+        // Aguarda 1 segundo (simula processamento)
+        await new Promise(r => setTimeout(r, 1000));
 
         let response = '';
+        let showFeedback = false;
         const q = text.toLowerCase();
 
-        // Horários de oração
-        if (q.includes('oração') || q.includes('oracao') || q.includes('prayer')) {
+        // === HORÁRIOS DE ORAÇÃO ===
+        if (q.includes('oração') || q.includes('oracao') || q.includes('prayer') || q.includes('salah')) {
             if (q.includes('maputo')) {
                 const data = await getPrayerTimes('Maputo', 'MZ');
                 if (data.success) {
                     const names = {Fajr:'Fajr',Sunrise:'Nascer do Sol',Dhuhr:'Dhuhr',Asr:'Asr',Maghrib:'Maghrib',Isha:'Isha'};
-                    response = `<strong>🕌 Horários - Maputo</strong><br><em>${data.date}</em><br><div class="prayer-grid">`;
+                    response = `<strong>🕌 Horários de Oração - Maputo</strong><br><em>${data.date}</em><br><div class="prayer-grid">`;
                     for (const [k,v] of Object.entries(data.timings)) {
                         if (names[k]) response += `<div class="prayer-card"><div class="prayer-name">${names[k]}</div><div class="prayer-time">${v}</div></div>`;
                     }
                     response += `</div><div class="source-tag"><i class="fa-solid fa-clock"></i> Al-Adhan API</div>`;
+                    showFeedback = true;
+                } else {
+                    response = `Não consegui obter os horários. Tente mais tarde ou contacte o suporte: <strong>860407269</strong>`;
                 }
             } else if (q.includes('beira')) {
                 const data = await getPrayerTimes('Beira', 'MZ');
                 if (data.success) {
                     const names = {Fajr:'Fajr',Sunrise:'Nascer do Sol',Dhuhr:'Dhuhr',Asr:'Asr',Maghrib:'Maghrib',Isha:'Isha'};
-                    response = `<strong>🕌 Horários - Beira</strong><br><em>${data.date}</em><br><div class="prayer-grid">`;
+                    response = `<strong>🕌 Horários de Oração - Beira</strong><br><em>${data.date}</em><br><div class="prayer-grid">`;
                     for (const [k,v] of Object.entries(data.timings)) {
                         if (names[k]) response += `<div class="prayer-card"><div class="prayer-name">${names[k]}</div><div class="prayer-time">${v}</div></div>`;
                     }
                     response += `</div><div class="source-tag"><i class="fa-solid fa-clock"></i> Al-Adhan API</div>`;
+                    showFeedback = true;
+                } else {
+                    response = `Não consegui obter os horários. Tente mais tarde ou contacte o suporte: <strong>860407269</strong>`;
                 }
             } else {
-                response = `Diga a cidade (ex: "Horários Maputo" ou "Horários Beira")`;
+                response = `Diga a cidade (ex: "Horários de oração Maputo" ou "Horários de oração Beira")`;
             }
         }
-        // Qibla
-        else if (q.includes('qibla') || q.includes('quibla') || q.includes('direção')) {
+        // === QIBLA ===
+        else if (q.includes('qibla') || q.includes('quibla') || q.includes('direção') || q.includes('direcao')) {
             if (q.includes('maputo')) {
                 const angle = calcQibla(-25.9692, 32.5732);
-                response = `<strong>🕋 Qibla - Maputo</strong><br><br>Direção: <strong>${Math.round(angle)}°</strong> a partir do Norte<br><br><div class="source-tag"><i class="fa-solid fa-compass"></i> Cálculo baseado na Kaaba</div>`;
+                response = `<strong>🕋 Direção da Qibla - Maputo</strong><br><br>Direção: <strong>${Math.round(angle)}°</strong> a partir do Norte<br><br><div class="source-tag"><i class="fa-solid fa-compass"></i> Cálculo baseado nas coordenadas da Kaaba</div>`;
+                showFeedback = true;
             } else {
-                response = `Diga a cidade (ex: "Qibla Maputo")`;
+                response = `Diga a cidade (ex: "Direção da Qibla em Maputo")`;
             }
         }
-        // Busca na memória
+        // === BUSCA NO CÉREBRO ===
         else {
             const match = findAnswer(text);
             if (match) {
-                response = match.answer + `<div class="source-tag"><i class="fa-solid fa-book"></i> ${match.source}</div>`;
+                response = match.answer;
+                if (match.source) response += `<div class="source-tag"><i class="fa-solid fa-book"></i> ${match.source}</div>`;
+                showFeedback = true;
             } else {
-                response = `Desculpe, ainda não tenho essa resposta na minha memória.<br><br>
-                <strong>Temas que conheço:</strong> Islam, Alcorão, Sunnah, Allah, Tawhid, Shirk, Profeta Muhammad, Wudu, Ghusl, Salat, Zakat, Ramadan, Hadiths, Duas, Caridade, Paciência<br><br>
-                📞 <strong>Suporte:</strong> 860407269`;
+                // RESPOSTA PADRÃO QUANDO NÃO ENCONTRA
+                response = `Desculpe, a resposta da sua pergunta não foi configurada.<br><br>
+                Para suporte, entre no chat WhatsApp com meu criador:<br>
+                📱 <strong>860407269</strong><br><br>
+                <div class="unanswered-note">
+                <i class="fa-solid fa-info-circle"></i> <strong>Nota para o criador:</strong> Por favor, envie esta pergunta para o WhatsApp <strong>860407269</strong> para que eu possa aprender e responder no futuro.
+                </div>`;
             }
         }
 
+        // ESCONDE SINAL DE PROCESSAMENTO
         hideTyping();
-        addMessage(response, false);
 
+        // MOSTRA RESPOSTA
+        addMessage(response, false, showFeedback);
+
+        // REATIVA INPUT
         chatInput.disabled = false;
         sendBtn.disabled = false;
         chatInput.focus();
     }
 
-    // Eventos
     sendBtn.addEventListener('click', handleSend);
     chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') handleSend(); });
 
-    // Tema
     document.getElementById('themeToggle').addEventListener('click', () => {
         const html = document.documentElement;
         const icon = document.querySelector('#themeToggle i');
@@ -673,7 +426,6 @@ Seu apoio ajuda a manter este serviço gratuito para a comunidade muçulmana.<br
         }
     });
 
-    // Sidebar
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     document.getElementById('menuToggle').addEventListener('click', () => {
@@ -685,64 +437,50 @@ Seu apoio ajuda a manter este serviço gratuito para a comunidade muçulmana.<br
         overlay.style.display = 'none';
     });
 
-    // Navegação
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', e => {
             e.preventDefault();
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
-
             const section = item.dataset.section;
-            const queries = {
-                quran: 'O que é Alcorão?',
-                prayer: 'Horários de oração Maputo',
-                qibla: 'Direção da Qibla Maputo',
-                duas: 'Dua para ansiedade',
-                support: 'suporte',
-                fiqh: 'Como fazer wudu?'
-            };
-            if (queries[section]) {
-                chatInput.value = queries[section];
-                handleSend();
-            }
-            if (window.innerWidth <= 900) {
-                sidebar.classList.remove('open');
-                overlay.style.display = 'none';
-            }
+            const queries = { quran: 'O que é Alcorão?', prayer: 'Horários de oração Maputo', qibla: 'Direção da Qibla Maputo', duas: 'Dua para ansiedade', support: 'suporte' };
+            if (queries[section]) { chatInput.value = queries[section]; handleSend(); }
+            if (window.innerWidth <= 900) { sidebar.classList.remove('open'); overlay.style.display = 'none'; }
         });
     });
 
-    // Limpar chat
     document.getElementById('clearChatBtn').addEventListener('click', () => {
         if (confirm('Limpar conversa?')) {
             messagesArea.innerHTML = '';
             messagesArea.appendChild(typingIndicator);
             setTimeout(() => {
-                addMessage(`<strong>Assalamu Alaikum! 🌙</strong><br><br>Pergunte sobre Islam...`, false);
+                const div = document.createElement('div');
+                div.className = 'message-wrapper bot';
+                div.innerHTML = `
+                    <div class="msg-avatar"><i class="fa-solid fa-mosque"></i></div>
+                    <div class="message-content">
+                        <div class="text-box">
+                            <strong>Assalamu Alaikum Warahmatullahi Wabarakatuh! 🌙</strong><br><br>
+                            Eu sou o <strong>Islam M.Bot</strong>, estou aqui para responder suas dúvidas sobre o Islam.<br><br>
+                            <em>Pergunte-me sobre Alcorão, Sunnah, Fiqh, Aqeedah, orações, duas...</em>
+                        </div>
+                        <span class="timestamp">${getTime()}</span>
+                    </div>`;
+                messagesArea.insertBefore(div, typingIndicator);
             }, 300);
         }
     });
 
-    // Voz
     const voiceBtn = document.getElementById('voiceBtn');
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const rec = new SpeechRecognition();
         rec.lang = 'pt-PT';
-        voiceBtn.addEventListener('click', () => {
-            rec.start();
-            voiceBtn.style.color = 'var(--primary)';
-        });
-        rec.onresult = e => {
-            chatInput.value = e.results[0][0].transcript;
-            voiceBtn.style.color = '';
-        };
+        voiceBtn.addEventListener('click', () => { rec.start(); voiceBtn.style.color = 'var(--primary)'; });
+        rec.onresult = e => { chatInput.value = e.results[0][0].transcript; voiceBtn.style.color = ''; };
         rec.onerror = () => { voiceBtn.style.color = ''; };
-    } else {
-        voiceBtn.style.display = 'none';
-    }
+    } else { voiceBtn.style.display = 'none'; }
 
-    // Atualizar timestamps
     document.querySelectorAll('[data-time="auto"]').forEach(el => el.textContent = getTime());
     </script>
 </body>
