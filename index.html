@@ -210,11 +210,16 @@
         let bestScore = 0;
 
         for (const [key, topic] of Object.entries(BOT_BRAIN)) {
+            // Pula entradas inválidas
+            if (!topic || typeof topic !== 'object') continue;
+
             let score = 0;
             // Verifica keywords
-            if (topic.keywords) {
+            if (topic.keywords && Array.isArray(topic.keywords)) {
                 for (const keyword of topic.keywords) {
-                    if (q.includes(keyword.toLowerCase())) score += keyword.length;
+                    if (typeof keyword === 'string' && q.includes(keyword.toLowerCase())) {
+                        score += keyword.length;
+                    }
                 }
             }
             // Verifica se a pergunta contém a chave
@@ -386,7 +391,19 @@
             const match = findAnswer(text);
             if (match) {
                 response = match.answer;
-                if (match.source) response += `<div class="source-tag"><i class="fa-solid fa-book"></i> ${match.source}</div>`;
+
+                // Montar source com link se existir
+                if (match.source) {
+                    let sourceHtml = '';
+                    if (match.link && typeof match.link === 'string' && match.link.trim() !== '') {
+                        // Source clicável com link
+                        sourceHtml = `<a href="${match.link}" target="_blank" rel="noopener noreferrer" class="source-tag" style="text-decoration:none;color:white;"><i class="fa-solid fa-book"></i> ${match.source} <i class="fa-solid fa-external-link-alt" style="font-size:9px;margin-left:4px;"></i></a>`;
+                    } else {
+                        // Source normal (sem link)
+                        sourceHtml = `<div class="source-tag"><i class="fa-solid fa-book"></i> ${match.source}</div>`;
+                    }
+                    response += sourceHtml;
+                }
                 showFeedback = true;
             } else {
                 // RESPOSTA PADRÃO QUANDO NÃO ENCONTRA
